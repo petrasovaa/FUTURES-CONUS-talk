@@ -43,6 +43,10 @@ body {
   line-height: 1em;
   font-weight: inherit; }
 
+.container {
+  display: grid;
+  grid-auto-flow: column; 
+  }
 /*********************************************
  * HEADERS
  *********************************************/
