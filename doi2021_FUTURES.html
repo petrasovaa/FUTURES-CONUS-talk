@@ -173,16 +173,6 @@
         <b>FUT</b>ure <b>U</b>rban-<b>R</b>egional <b>E</b>nvironment <b>S</b>imulation
 </section>
 
-<section>
-    <h2>FUTURES</h2>
-    <ul>
-        <li>simulates urban growth (undeveloped to developed)</li>
-        <li>accounts for location, quantity, and pattern of change</li>
-        <li>patch-based land change model</li>
-        <li>stochastic</li>
-    </ul>
-    <img src="img/FUTURES_Raleigh.png" class="stretch">
-</section>
 <section >
     <h2>FUTURES</h2>
     <div class="container">
@@ -265,6 +255,7 @@
         <li>to provide detailed national urbanization projections</li>
         <li>to study urbanization trends inside and outside of floodplain</li>
     </ul>
+    <p style="font-size: 130%;padding-top: 1em;"> 16,000,000,000 cells at 30 m resolution
     </div>
     <div class="col">
     <img src="img/scale.png"></div>
@@ -339,6 +330,120 @@
     </ol>
     <img src="img/PGA.gif">
 </section>
+<section>
+    <h2>NCSU Henry2 cluster</h2>
+    
+    <div class="container">
+        <div class="col">
+            <ul>
+                <li>Total nodes online: 933</li>
+                <li>Total cores online: 13644 (2021-11-19)</li>
+                <li>Python, R, GRASS GIS</li>
+            </ul>
+            <pre style="font-size:40%;"><code class="language-bash hljs">
+*******************************************************************************
+*                                                                             *
+*               North Carolina State University, Raleigh, NC 27695            *
+*                      Office of Information Technology                       *
+*                           http://hpc.ncsu.edu/                              *
+*                                                                             *
+*******************************************************************************
+*                                                                             *
+*                      Welcome to henry2 Linux cluster                        *
+*                                                                             *
+*******************************************************************************
+*******************************************************************************
+*                           WARNING - USER BEWARE                             *
+*                                                                             *
+*   This is a NC State HPC Production System. Use of this system is subject   *
+*   to NC State Computer Use Policy - policies.ncsu.edu/policy/pol-08-00-01   *
+*   and the OIT HPC Acceptable Use Policy - hpc.ncsu.edu/About/AUP.php        *
+*                                                                             *
+*   Share/scratch/tmp-space is NOT being backed-up and files are subject to   *
+*   deletion at any time. You use share/scratch/tmp disk space at your own    *
+*   risk.                                                                     *
+*                                                                             *
+*   Security violations, and unauthorized or unlawfull use of this system     *
+*   will be prosecuted.                                                       *
+*                                                                             *
+*******************************************************************************
+            </code></pre>
+        </div>
+        <div class="col"><img src="img/henry2.png"></div>
+    </div>
+</section>
+
+
+<section>
+    <h2>Parallelization approaches</h2>
+    Most of our tasks are "pleasantly parallel"
+    <div class="container">
+        <div class="col">
+            <img src="img/stochastic.png"><br>
+            independent computations
+            (stochastic runs)
+        </div>
+        <div class="col">
+            <img src="img/tiling.jpg"><br>
+            divide spatial domain (tiles with overlaps,
+        states, counties)</div>
+    </div>
+</section>
+
+<section>
+    <h2>Tiling approach example</h2>
+    <p style="text-align: left;">Moving window analysis with large window size parallelized using GRASS GIS GridModule:</p>
+    <pre style="font-size:45%;"><code data-trim class="language-python hljs">
+        grd = GridModule("r.futures.devpressure", width=161200, height=6600, overlap=30, processes=16, **params)
+        grd.run()
+    </code></pre>
+    <p style="text-align: left;">Tiled raster algebra:</p>
+    <pre style="font-size:45%;"><code data-trim class="language-bash hljs">
+        r.mapcalc.tiled "dist_to_forest_log = log(dist_to_forest)" width=161200 height=6600 processes=16
+    </code></pre>
+    <p style="text-align: left;">Caveats:</p>
+    <ul>
+        <li>Doesn't scale across nodes (max 30 cores per node)</li>
+        <li>How you do tiling impacts performance</li>
+        <li>Overhead can make it slower than without tiling</li>
+        <li>Does not work for certain algorithms (e.g. hydrology)</li>
+    </ul>
+</section>
+<section>
+    <h2>Independent runs</h2>
+    Distribute computing across nodes using MPI (Message Passing Interface standard):
+    <pre style="font-size:45%;">jobs.txt<code data-trim class="language-bash hljs">
+        grass --tmp-mapset ~/grassdata/albers/ --exec r.futures.demand subregions=subregion_1 output=file1.csv ...
+        grass --tmp-mapset ~/grassdata/albers/ --exec r.futures.demand subregions=subregion_2 output=file2.csv ...
+        grass --tmp-mapset ~/grassdata/albers/ --exec r.futures.demand subregions=subregion_3 output=file3.csv ...
+    </code></pre>
+    <pre style="font-size:45%;">submit.sh<code data-trim class="language-bash hljs">
+        mpiexec python -m mpi4py -m pynodelauncher myjobs.txt
+    </code></pre>
+    <p style="text-align: left;">Caveats:</p>
+    <div class="container">
+        <div class="col">
+    <ul>
+        <li>Need to know how much memory you need and assign number of cores per node accordingly</li>
+        <li>Gets tricky if some processes take much longer than others (looking at you, Texas)</li>
+    </ul></div>
+    <div class="col"><img src="img/big-texas-map.jpg"><br>
+        <p style="font-size:15%;">texasproud.com/how-big-is-texas-its-huge</p>
+    </div>
+    
+</section>
+<section>
+    <h2>Parallelization using OpenMP</h2>
+    <ul>
+        <li>Implemented on algorithm level</li>
+        <li>Shared-memory parallelism (doesn't scale across nodes)</li>
+        <li>Convenient for user</li>
+        <li>Code works even without OpenMP</li>
+        <li>Newly parallelized modules in GRASS GIS thanks to GSoC 2021</li>
+    </ul>
+    <img src="img/openmp_graph.png" class="stretch">
+</section>
+
 
             </div>
         </div>
