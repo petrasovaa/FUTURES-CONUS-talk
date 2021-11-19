@@ -194,7 +194,7 @@
         <li>stochastic</li>
     </ul></div>
     <div class="col">
-        <img src="img/PGA.gif">
+        <img src="img/cool_futures.png">
     </div></div>
 </section>
 
@@ -273,7 +273,7 @@
 
 
 <section>
-    <h2>Input datasets</h2>
+    <h2>Input datasets: Land cover</h2>
         NLCD 2001 - 2019
         <p>Land cover
         <img src="img/nlcd.png">
@@ -282,7 +282,7 @@
     <img src="img/nlcd_descriptor.png">
 </section>
 <section>
-    <h2>Input datasets</h2>
+    <h2>Input datasets: Population</h2>
     <ul>
         <li>past population  <a href="https://seer.cancer.gov/popdata/download.html">(SEER)</a></li>
         <li>county level population projections <a href="https://www.nature.com/articles/sdata20195"></a>(Hauer et al.)</a></li>
@@ -294,6 +294,7 @@
 <section>
     <h2>Input datasets</h2>
     <ul>
+        <li>NED DEM (USGS)</li>
         <li>protected areas (PAD-US by USGS)</li>
         <li>USA National Commodity Crop Productivity Index</a></li>
         <li><a href="https://svi.cdc.gov/">CDC Social Vulnerability Index</a></li>
@@ -309,15 +310,34 @@
 </section>
 <section>
     <h2>Where to develop?</h2>
-    
+    <ol>
+        <li>Derive predictors (distance to water, roads, ...)</li>
+        <li>Derive newly developed pixels (raster algebra)</li>
+        <li>Sample predictors (2,000,000 points)</li>
+        <li>Run logistic regression for different combinations of predictors</li>
+        <li>Create development suitability surface</li>
+    </ol>
+    <img src="img/potential.png" class="stretch">
 </section>
 <section>
     <h2>How much land?</h2>
-    NLCD urbanized class 
+    <p>
+    Projects land consumption for each year and county
+    based on NLCD and past and projected population:
+    <br>
+    <div class="container">
+        <div class="col"><img src="img/demand_Raleigh.png"><br>Raleigh-Cary Metro Area</div>
+        <div class="col"><img src="img/demand_NC.png">NC</div>
+    </div>
+    
 </section>
 <section>
     <h2>What is the size and shape?</h2>
-    
+    <ol>
+        <li>Calibrate patch size and compactness from past urban change</li>
+        <li>Grow patches in suitable areas until demand met</li>
+    </ol>
+    <img src="img/PGA.gif">
 </section>
 
             </div>
