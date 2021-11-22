@@ -435,15 +435,95 @@
 <section>
     <h2>Parallelization using OpenMP</h2>
     <ul>
-        <li>Implemented on algorithm level (can be complex)</li>
+        <li>Implemented on algorithm level (C/C++)</li>
         <li>Shared-memory parallelism (doesn't scale across nodes)</li>
         <li>Convenient for user</li>
-        <li>Code works even without OpenMP</li>
         <li>Newly parallelized modules in GRASS GIS thanks to GSoC 2021</li>
     </ul>
     <img src="img/openmp_graph.png" class="stretch">
 </section>
 
+<section>
+    <h2>Memory handling</h2>
+    <div class="container">
+        <div class="col">
+    <ul>
+        <li>Can't fit entire study area into memory</li>
+        <li>Parallelization by states leads to unequal memory consumption</li>
+        <li>GRASS GIS segment library: only loads what fits in memory
+            <pre><code>r.futures.pga ... memory=12000</code></pre>
+        </li>
+        <li>example of HPC submission parameters <div style="font-size:60%">(9 processes per node, 3 nodes, 120GB each)</div>
+            <pre>
+<code data-trim class="language-bash hljs">
+            #!/bin/bash 
+            #BSUB -n 27
+            #BSUB -R "rusage[mem=120GB]"
+            #BSUB -R span[ptile=9]
+        </code></pre></li>
+    </ul>
+    </div>
+    <div class="col">
+    <img src="img/memory.png"><br>Henry2 nodes by memory (edited)
+    </div>
+</section>
+
+<section>
+    <h2>Challenges</h2>
+</section>
+
+<section>
+    <h2>Parallelization by states</h2>
+    We needed to respect Metropolitan Statistical Areas boundaries:
+
+    <img src="img/MSA.png" class="stretch">
+</section>
+<section>
+    <h2>SSP5 scenario</h2>
+    <div class="container">
+        <div class="col"><img src="img/SSP.png"></div>
+        <div class="col"><img src="img/SSP5.png"><br>New development by 2100</div>
+    </div>
+</section>
+<section>
+    <h2>Automatic fitting of densification curves</h2>
+   
+    <div class="container">
+        <div class="col"><img src="img/log.png"></div>
+        <div class="col"><img src="img/log2.png"></div>
+    </div>
+    Which curve do we fit?
+
+</section>
+<section>
+    <h2>LCMAP or NLCD?</h2>
+    Similar products:
+    <img src="img/LCMAP.png">
+    LCMAP: completely automated, 33-year historical period
+        <img src="img/NLCD.png">
+        NLCD: higher level of thematic detail
+</section>
+<section>
+    <h2>LCMAP: decline in developed area</h2>
+
+    <div class="container">
+        <div class="col"><img src="img/demand_20020_NLCD.png"></div>
+        <div class="col"><img src="img/demand_20020_LCMAP.png"></div>
+    </div>
+    Dothan, AL Metro Area
+
+</section>
+<section>
+    <h2>NLCD vs LCMAP developed area trends</h2>
+
+    <div class="container">
+        <div class="col">NLCD<img src="img/LCMAPvsNLCD1.png"></div>
+        <div class="col">LCMAP<img src="img/LCMAPvsNLCD2.png"></div>
+    </div>
+    Trends in developed area and population in counties
+    (2001-2016)
+
+</section>
 
             </div>
         </div>
