@@ -276,7 +276,7 @@
     <h2>Input datasets: Population</h2>
     <ul>
         <li>past population  <a href="https://seer.cancer.gov/popdata/download.html">(SEER)</a></li>
-        <li>county level population projections <a href="https://www.nature.com/articles/sdata20195"></a>(Hauer et al.)</a></li>
+        <li>county level population projections <a href="https://www.nature.com/articles/sdata20195"></a>(Hauer et al. 2019)</a></li>
         <li>shared socioeconomic pathway SSP2 (Middle of the Road)</li>
     </ul>
     <img src="img/SSP.png"><br>
@@ -530,11 +530,12 @@
 <section><h1>Results</h1>(preliminary)</section>
 
 <section>
-    <h2>NE Raleigh 2100: single run</h2>
+    <h2>NE Raleigh by 2100</h2>
     <div class="container">
         <div class="col"><img src="img/raleigh_run1.png"></div>
         <div class="col"><img src="img/raleigh_run2.png"></div>
     </div>
+    2 runs with different random seeds
 </section>
 <section>
     <h2>NE Raleigh: probability</h2>
@@ -569,14 +570,28 @@
     <img src="img/dakota.png" class="stretch">
 </section>
 
+
 <section>
-    <blockquote>
-        Prediction is very difficult, especially if it's about the future.
-    </blockquote>
-</section>
-<section>
-<h2>Benchmarks</h2>
-Simple raster algebra: 30 min vs 10 min (tiling approach on 16 cores))
+<h2>Benchmark examples</h2>
+<ul>
+    <li>Simple raster algebra</li>
+        <ul>
+            <li>30 min without paralellization</li>
+            <li>10 min with tiling approach on 16 cores</li>
+        </ul>
+    <li>Stratified random sampling
+        <ul>
+            <li>approx 2 mil points, 30 rasters</li>
+            <li>2.6 hours on 200 cores</li>
+        </ul>
+    </li>
+    <li> FUTURES patch growing simulation
+        <ul>
+            <li>20-30 hours on 27 cores on 3 nodes with 120 GB each</li>
+            <li>simultaneosly running jobs with different random seeds</li>
+        </ul>
+    </li>
+</ul>
 </section>
 <section>
     <h2>FUTURES v3</h2>
