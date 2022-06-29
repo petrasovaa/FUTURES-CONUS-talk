@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>FOSS4G2022 GRASS GIS parallelization talk</title>
+
+        <meta name="description" content="FOSS4G2022_talk">
+        <meta name="author" content="Anna Petrasova">
+
+        <link rel="stylesheet" href="dist/reset.css">
+        <link rel="stylesheet" href="dist/reveal.css">
+        <link rel="stylesheet" href="css/theme/osgeo.css" id="theme">
+        <link rel="stylesheet" href="css/nouislider.min.css" id="slide">
+
+        <!-- Theme used for syntax highlighted code -->
+        <link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+        <!-- For chalkboard plugin -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+        <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+        <script>
+            if( window.location.search.match( /print-pdf/gi ) ) {
+                var link = document.createElement( 'link' );
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = 'css/print/pdf.css';
+                document.getElementsByTagName( 'head' )[0].appendChild( link );
+            }
+        </script>
+
+<!--        <link href="https://fonts.googleapis.com/css?family=Miriam+Libre" rel="stylesheet">-->
+<style>
+/* miriam-libre-regular - latin */
+@font-face {
+  font-family: 'Miriam Libre';
+  font-style: normal;
+  font-weight: 400;
+  src: url('lib/font/miriam-libre/miriam-libre-v1-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Miriam Libre'), local('MiriamLibre-Regular'),
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-regular.svg#MiriamLibre') format('svg'); /* Legacy iOS */
+}
+
+/* miriam-libre-700 - latin */
+@font-face {
+  font-family: 'Miriam Libre';
+  font-style: normal;
+  font-weight: 700;
+  src: url('lib/font/miriam-libre/miriam-libre-v1-latin-700.eot'); /* IE9 Compat Modes */
+  src: local('Miriam Libre Bold'), local('MiriamLibre-Bold'),
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-700.woff') format('woff'), /* Modern Browsers */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-700.svg#MiriamLibre') format('svg'); /* Legacy iOS */
+}
+
+
+/* sintony-regular - latin */
+@font-face {
+  font-family: 'Sintony';
+  font-style: normal;
+  font-weight: 400;
+  src: url('lib/font/sintony/sintony-v4-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Sintony'),
+       url('lib/font/sintony/sintony-v4-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('lib/font/sintony/sintony-v4-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('lib/font/sintony/sintony-v4-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('lib/font/sintony/sintony-v4-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('lib/font/sintony/sintony-v4-latin-regular.svg#Sintony') format('svg'); /* Legacy iOS */
+}
+
+/* sintony-700 - latin */
+@font-face {
+  font-family: 'Sintony';
+  font-style: normal;
+  font-weight: 700;
+  src: url('lib/font/sintony/sintony-v4-latin-700.eot'); /* IE9 Compat Modes */
+  src: local('Sintony Bold'), local('Sintony-Bold'),
+       url('lib/font/sintony/sintony-v4-latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('lib/font/sintony/sintony-v4-latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+       url('lib/font/sintony/sintony-v4-latin-700.woff') format('woff'), /* Modern Browsers */
+       url('lib/font/sintony/sintony-v4-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('lib/font/sintony/sintony-v4-latin-700.svg#Sintony') format('svg'); /* Legacy iOS */
+}
+
+.reveal li > ul {
+    font-size: 85%;
+    line-height: 110%;
+  }
+
+.reveal small {
+  display: inline-block;
+  font-size: smaller;
+  line-height: 1.2em;
+  vertical-align: baseline;
+  margin: 0.1em; }
+
+.reveal small * {
+  vertical-align: baseline; }
+
+.reveal .credit {
+  font-size: small;
+  color: gray;
+  margin: 0.1em;
+}
+
+.reveal .right, .reveal .textimg > img, .reveal .textimg > video, .reveal .textimg > iframe, .reveal .imgtext > p, .reveal .imgtext > ul, .reveal .imgtext > ol, .reveal .imgtext > div {
+    float: right;
+    text-align: left;
+    max-width: 47%;
+}
+
+.reveal .left, .reveal .imgtext > img, .reveal .imgtext > video, .reveal .imgtext > iframe, .reveal .textimg > p, .reveal .textimg > ul, .reveal .textimg > ol, .reveal .textimg > div {
+    float: left;
+    text-align: left;
+    max-width: 47%;
+}
+.flexcontainer {
+  display: flex;
+  width: 100%;
+  /* padding: 16% 2%; */
+  box-sizing: border-box;
+  /* height: 5vh; */
+  flex-wrap: wrap;
+}
+
+.flexbox {
+  flex: 1;
+  flex: 1 0 22%; 
+  overflow: hidden;
+  transition: .5s;
+  margin: 0 4%;
+  box-shadow: 0 20px 30px rgba(0,0,0,.1);
+  line-height: 0;
+}
+
+.flexbox > img {
+  width: 100%;
+  height: calc(90% - 4vh);
+  object-fit: cover;
+  margin: 0% 0%;
+  transition: .5s;
+}
+
+.flexbox > span {
+  font-size: 2vh;
+  display: block;
+  text-align: center;
+  /* height: 2.5vh; */
+  line-height: 0.9;
+}
+
+</style>
+
+
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+
+<section>
+    <h1>Tips for parallelization in GRASS GIS</h1>
+    <h2>in the context of land change modeling</h2>
+    <img src="img/FUTURES_addon.png" class="stretch">
+    <p style="margin-top: 0.5em">
+        Anna Petrasova, Vaclav Petras
+    </p>
+    <p class="title-foot">
+        <a href="http://geospatial.ncsu.edu/geoforall/" title="NCSU GeoForAll Lab">NCSU GeoForAll Lab</a>
+        at the
+        <a href="http://geospatial.ncsu.edu/" title="NCSU Center for Geospatial Analytics">Center for Geospatial Analytics</a>
+        <br>
+        <a href="http://www.ncsu.edu/" title="NC State University">NC State University</a>
+    </p>
+    
+    <!-- <p><small>DOI, Open GIS Group, Dec 2nd, 2021</small></p> -->
+</section>
+
+
+<section>
+<h2>Anna Petrasova</h2>
+<ul>
+    <li>BS &amp; MS in Geoinformatics, Czech Technical University in Prague
+    <li>PhD in Geospatial Analytics, NC State
+    <li>Geospatial Research Software Engineer at the Center for Geospatial Analytics, NC State
+    <li>GRASS GIS Development Team Member
+    <li>GRASS GIS Project Steering Committee Member
+    <li>Open Source Geospatial Foundation Charter Member
+</ul>
+</section>
+
+<section>
+    <h2>GRASS GIS</h2>
+    <ul>
+        <li>Open-source GIS and geoprocessing engine</li>
+        <li>
+            Processing tools:
+            <b>500+</b> <a href="https://grass.osgeo.org/grass-stable/manuals/full_index.html">in core</a>,
+            <b>400+</b> <a href="https://grass.osgeo.org/grass-stable/manuals/addons/">addons</a></li>
+        <li>Interfaces: graphical, command line, Python, C</li>
+        <li>3rd party interfaces: actinia (REST API), R, QGIS, OGC WPS</li>
+        <li>All-in-one Software Suite
+    </ul>
+    <img src="img/gui_pink_viewshed.png" class="stretch">
+</section>
+
+<section>
+    <h2>GIS workflows</h2>
+        <img src="img/g_gui_gmodeler_model_usle.png" height="">
+        <br>
+    <p class="small">GRASS GIS modeler</p>
+    
+</section>
+
+<section>
+    <h2>Intro to GRASS parallelization</h2>
+    <p> Tool-level parallelization
+        <br>
+        <pre><code data-trim data-noescape>r.neighbors input=elevation output=elevation_smoothed size=15 <mark> nprocs=4</mark></code></pre>
+        <img src="img/neighbors_example.png" width="70%">
+    <p> Workflow-level parallelization<br>
+        <pre><code data-trim data-noescape>
+            r.grow.distance input=urban distance=dist_to_urban &
+            r.grow.distance input=water distance=dist_to_water &
+            r.grow.distance input=forest distance=dist_to_forest &
+        </code></pre>
+        <img src="img/distance_example.png" width="70%">
+    
+</section>
+
+<section>
+    <h2>Parallel tools  <span style="font-size:70%">(GRASS GIS 8.2)</span></h2>
+    <!-- C tools with OpenMP support (as of GRASS GIS 8.2) -->
+    <div class="flexcontainer">
+        <div class="flexbox">
+          <img src="img/module_rneighbors.png">
+          <span>r.neighbors</span>
+        </div>
+        <div class="flexbox">
+          <img src="img/module_rmfilter.png">
+          <span>r.mfilter</span>
+        </div>
+        <div class="flexbox">
+          <img src="img/module_rslopeaspect.png">
+          <span>r.slope.aspect</span>
+        </div>
+        <div class="flexbox">
+          <img src="img/module_rseries.png">
+          <span>r.series</span>
+        </div>
+        <div class="flexbox">
+            <img src="img/module_rpatch.png">
+            <span>r.patch</span>
+        </div>
+        <div class="flexbox">
+            <img src="img/module_rsun.png">
+            <span>r.sun</span>
+        </div>
+        <div class="flexbox">
+            <img src="img/module_vsurfrst.png">
+            <span>v.surf.rst</span>
+        </div>
+        <div class="flexbox">
+            <img src="img/module_rsimwater.png">
+            <span>r.sim.water</span>
+        </div>
+        <div class="flexbox">
+            <img src="img/module_rsimsediment.png">
+            <span>r.sim.sediment</span>
+        </div>
+      </div>
+</section>
+
+<section>
+    <h2>Multi-threading with OpenMP</h2>
+    <ul>
+        <li>relatively easy integration into existing source code</li>
+        <li>single code base for all platforms</li>
+    </ul>
+<pre><code data-trim data-noescape data-line-numbers="1,4,6">
+#pragma omp parallel if(threaded) private(row, col, i)
+    {
+        int t_id = 0;
+#if defined(_OPENMP)
+        t_id = omp_get_thread_num();
+#endif
+        struct input *in = inputs[t_id];
+        DCELL *val = values[t_id];
+        ...
+        </code></pre>
+     
+<p> Beware race conditions, valgrind is your friend.
+
+</section>
+<section>
+    <h2>r.neighbors benchmark <span style="font-size:60%">400 million cells</span></h2>
+    <img src="img/benchmark.svg" class="stretch">
+    <p style="font-size:60%">\[\mbox{parallel efficiency} = \frac{\mbox{serial processing time}}{N \times \mbox{parallel processing time with N cores}} \]</p>
+    
+</section>
+
+<section>
+    <h2>More benchmarks</h2>
+    <table>
+        <tr>
+          <th>module</th>
+          <th>parallel processing time</th>
+          <th>speedup for 12 cores</th>
+        </tr>
+        <tr>
+          <td>r.neighbors</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>r.slope.aspect</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </table>
+    <p>Use more cores for larger window sizes</p>
+</section>
+<!-- 
+<section>
+    <h2>FUTURES</h2>
+    
+    <ul>
+        <li>developed at Center for Geospatial Analytics (CGA), NC State</li>
+        <li>to address the regional-scale environmental impacts of urbanization</li>
+        <li>explicitly captures the spatial structure of development</li>
+        <li>flexible (in terms of predictors, scenarios)</li>
+    </ul>
+    <img src="img/FUTURES_Raleigh.png" class="stretch">
+    <p>
+        <b>FUT</b>ure <b>U</b>rban-<b>R</b>egional <b>E</b>nvironment <b>S</b>imulation
+</section>
+
+<section >
+    <h2>FUTURES</h2>
+    <div class="container">
+        <div class="col">
+    <ul>
+        <li>simulates urban growth (undeveloped to developed)</li>
+        <li>accounts for location, quantity, and pattern of change</li>
+        <li>patch-based land change model</li>
+        <li>stochastic</li>
+    </ul></div>
+    <div class="col">
+        <img src="img/cool_futures.png">
+    </div></div>
+</section>
+
+
+
+
+<section>
+    <h2>FUTURES software implementation</h2>
+    <div class="container">
+        <div class="col">
+    <ul>
+        <li>open source</li>
+        <li>GRASS GIS addon</li>
+        <li>set of modules r.futures.*</li>
+        <li>written in C and Python</li>
+        <li>runs on all platforms</li>
+        <li>hosted on GitHub</li>
+    </ul></div>
+    <div class="col">
+    <img src="img/grass_gis.svg" width="70%">
+    </div>
+</section>
+
+
+<section>
+    <h2>Why GRASS GIS?</h2>
+    <img src="img/modules.png" class="stretch">
+    <p>
+    All needed GIS functions at hand
+</section>
+<section>
+    <h2>Why GRASS GIS?</h2>
+    <img src="img/futures_gui.png" class="stretch">
+    <p>Automatically generated CLI and GUI
+</section>
+<section>
+    <h2>Why GRASS GIS?</h2>
+    <img src="img/r_external_us.png" class="stretch">
+    <p>Efficient I/O libraries and processing of large datasets
+</section>
+<section>
+    <h2>Why GRASS GIS?</h2>
+    <img src="img/languages.png" class="stretch">
+    <p>Modular architecture: modules in C/C++ and Python
+</section>
+<section>
+    <h2>Why GRASS GIS?</h2>
+
+    <iframe data-src="https://grass.osgeo.org/grass78/manuals/addons/r.futures.devpressure.html" data-preload class="stretch"></iframe>
+    <p>Infrastructure for online manual pages and distribution of binaries
+     <img src="img/languages.png" class="stretch">
+</section>
+<section>
+    <h2>Why GRASS GIS?</h2>
+    <img src="img/grass_team.jpg" class="stretch">
+    <p>Maintained by community and developers
+</section>
+
+
+<section>
+    <h2>Why CONUS case study?</h2>
+    <div class="container">
+        <div class="col">
+    <ul>
+        <li>previous case studies showed potential to scale up</li>
+        <li>available datasets (NLCD, etc.)</li>
+        <li>available computing infrastructure</li>
+        <li>to provide detailed national urbanization projections</li>
+        <li>to study urbanization trends inside and outside of floodplain</li>
+    </ul>
+    <p style="font-size: 130%;padding-top: 1em;"> 16,000,000,000 cells at 30 m resolution
+    </div>
+    <div class="col">
+    <img src="img/scale.png"></div>
+</section>
+
+
+
+<section>
+    <h2>Input datasets: Land cover</h2>
+        NLCD 2001 - 2019
+        
+        <img src="img/nlcd.png">
+        Land cover
+        <img src="img/nlcd_descriptor.png">
+        Impervious descriptor
+</section>
+<section>
+    <h2>Input datasets: Population</h2>
+    <ul>
+        <li>past population  <a href="https://seer.cancer.gov/popdata/download.html">(SEER)</a></li>
+        <li>county level population projections <a href="https://www.nature.com/articles/sdata20195"></a>(Hauer et al. 2019)</a></li>
+        <li>shared socioeconomic pathway SSP2 (Middle of the Road)</li>
+    </ul>
+    <img src="img/SSP.png"><br>
+    source: Hauer et al 2019
+</section>
+<section>
+    <h2>Input datasets</h2>
+    <ul>
+        <li>NED DEM (USGS)</li>
+        <li>protected areas (PAD-US by USGS)</li>
+        <li>USA National Commodity Crop Productivity Index</a></li>
+        <li><a href="https://svi.cdc.gov/">CDC Social Vulnerability Index</a></li>
+        <li>boundary datasets: counties, metropolitan statistical areas
+    </ul>
+    <img src="img/svimap.png" class="stretch"><br>
+    SVI, source: CDC
+</section>
+
+<section>
+    <h2>FUTURES schema</h2>
+    <img src="img/FUTURES_schema.png" width="80%">
+</section>
+<section>
+    <h2>Where to develop?</h2>
+    <ol>
+        <li>Derive predictors (distance to water, roads, forest, SVI, crop index, slope)</li>
+        <li>Derive newly developed pixels (raster algebra)</li>
+        <li>Sample predictors (2,000,000 points)</li>
+        <li>Run logistic regression for different combinations of predictors</li>
+        <li>Create development suitability surface</li>
+    </ol>
+    <img src="img/potential.png" class="stretch">
+</section>
+<section>
+    <h2>How much land?</h2>
+    <p>
+    Projects land consumption for each year and county
+    based on NLCD and past and projected population:
+    <br>
+    <div class="container">
+        <div class="col"><img src="img/demand_Raleigh.png"><br>Raleigh-Cary Metro Area</div>
+        <div class="col"><img src="img/demand_NC.png">NC</div>
+    </div>
+    
+</section>
+<section>
+    <h2>What is the size and shape?</h2>
+    <ol>
+        <li>Calibrate patch size and compactness from past urban change</li>
+        <li>Grow patches in suitable areas until demand met</li>
+    </ol>
+    <img src="img/PGA.gif" class="stretch">
+</section>
+<section>
+    <h2>NCSU Henry2 cluster</h2>
+    
+    <div class="container">
+        <div class="col">
+            <ul>
+                <li>Total nodes online: 933</li>
+                <li>Total cores online: 13644 (2021-11-19)</li>
+                <li>Python, R, GRASS GIS</li>
+            </ul>
+            <pre style="font-size:40%;"><code class="language-bash hljs">
+*******************************************************************************
+*                                                                             *
+*               North Carolina State University, Raleigh, NC 27695            *
+*                      Office of Information Technology                       *
+*                           http://hpc.ncsu.edu/                              *
+*                                                                             *
+*******************************************************************************
+*                                                                             *
+*                      Welcome to henry2 Linux cluster                        *
+*                                                                             *
+*******************************************************************************
+*******************************************************************************
+*                           WARNING - USER BEWARE                             *
+*                                                                             *
+*   This is a NC State HPC Production System. Use of this system is subject   *
+*   to NC State Computer Use Policy - policies.ncsu.edu/policy/pol-08-00-01   *
+*   and the OIT HPC Acceptable Use Policy - hpc.ncsu.edu/About/AUP.php        *
+*                                                                             *
+*   Share/scratch/tmp-space is NOT being backed-up and files are subject to   *
+*   deletion at any time. You use share/scratch/tmp disk space at your own    *
+*   risk.                                                                     *
+*                                                                             *
+*   Security violations, and unauthorized or unlawfull use of this system     *
+*   will be prosecuted.                                                       *
+*                                                                             *
+*******************************************************************************
+            </code></pre>
+        </div>
+        <div class="col"><img src="img/henry2.png"></div>
+    </div>
+</section>
+
+
+<section>
+    <h2>Parallelization approaches</h2>
+    Most of our tasks are "pleasantly parallel"
+    <div class="container">
+        <div class="col">
+            <img src="img/stochastic.png"><br>
+            independent computations
+            (stochastic runs)
+        </div>
+        <div class="col">
+            <img src="img/tiling.jpg"><br>
+            divide spatial domain (tiles with overlaps,
+        states, counties)</div>
+    </div>
+</section>
+
+<section>
+    <h2>Tiling approach example</h2>
+    <p style="text-align: left;">Moving window analysis with large window size parallelized using GRASS GIS GridModule:</p>
+    <pre style="font-size:45%;"><code data-trim class="language-python hljs">
+        grd = GridModule("r.futures.devpressure", width=161200, height=6600, overlap=30, processes=16, **params)
+        grd.run()
+    </code></pre>
+    <p style="text-align: left;">Tiled raster algebra:</p>
+    <pre style="font-size:45%;"><code data-trim class="language-bash hljs">
+        r.mapcalc.tiled "dist_to_forest_log = log(dist_to_forest)" width=161200 height=6600 processes=16
+    </code></pre>
+    <p style="text-align: left;">Caveats:</p>
+    <ul>
+        <li>Doesn't scale across nodes (max 30 cores per node)</li>
+        <li>How you do tiling impacts performance</li>
+        <li>Overhead can make it slower than without tiling</li>
+        <li>Does not work for certain algorithms (e.g. hydrology)</li>
+    </ul>
+</section>
+<section>
+    <h2>Independent runs</h2>
+    Distribute computing across nodes using MPI (Message Passing Interface standard):
+    <pre style="font-size:45%;">jobs.txt<code data-trim class="language-bash hljs">
+        grass --tmp-mapset ~/grassdata/albers/ --exec r.futures.demand subregions=subregion_1 output=file1.csv ...
+        grass --tmp-mapset ~/grassdata/albers/ --exec r.futures.demand subregions=subregion_2 output=file2.csv ...
+        grass --tmp-mapset ~/grassdata/albers/ --exec r.futures.demand subregions=subregion_3 output=file3.csv ...
+    </code></pre>
+    <pre style="font-size:45%;">submit.sh<code data-trim class="language-bash hljs">
+        mpiexec python -m mpi4py -m pynodelauncher myjobs.txt
+    </code></pre>
+    <p style="text-align: left;">Caveats:</p>
+    <div class="container">
+        <div class="col">
+    <ul>
+        <li>Need to know how much memory you need and assign number of cores per node accordingly</li>
+        <li>Gets tricky if some processes take much longer than others (looking at you, Texas)</li>
+    </ul></div>
+    <div class="col"><img src="img/big-texas-map.jpg"><br>
+        <p style="font-size:15%;">texasproud.com/how-big-is-texas-its-huge</p>
+    </div>
+    
+</section>
+<section>
+    <h2>Parallelization using OpenMP</h2>
+    <ul>
+        <li>Implemented on algorithm level (C/C++)</li>
+        <li>Shared-memory parallelism (doesn't scale across nodes)</li>
+        <li>Convenient for user</li>
+        <li>Newly parallelized modules in GRASS GIS thanks to GSoC 2021</li>
+    </ul>
+    <img src="img/openmp_graph.png" class="stretch">
+</section>
+
+<section>
+    <h2>Memory handling</h2>
+    <div class="container">
+        <div class="col">
+    <ul>
+        <li>Can't fit entire study area into memory</li>
+        <li>Parallelization by states leads to unequal memory consumption</li>
+        <li>GRASS GIS segment library: only loads what fits in memory
+            <pre><code>r.futures.pga ... memory=12000</code></pre>
+        </li>
+        <li>example of HPC submission parameters <div style="font-size:60%">(9 processes per node, 3 nodes, 120GB each)</div>
+            <pre>
+<code data-trim class="language-bash hljs">
+            #!/bin/bash 
+            #BSUB -n 27
+            #BSUB -R "rusage[mem=120GB]"
+            #BSUB -R span[ptile=9]
+        </code></pre></li>
+    </ul>
+    </div>
+    <div class="col">
+    <img src="img/memory.png"><br>Henry2 nodes by memory (edited)
+    </div>
+</section>
+
+<section>
+    <h1>Challenges</h1>
+</section>
+<section>
+    <h2>GIS on HPC</h2>
+    <img src="img/HPC_interaction.png" class="stretch">
+</section>
+<section>
+    <h2>Parallelization by states</h2>
+    We needed to respect Metropolitan Statistical Areas boundaries:
+
+    <img src="img/MSA.png" class="stretch">
+</section>
+<section>
+    <h2>SSP5 scenario</h2>
+    <div class="container">
+        <div class="col"><img src="img/SSP.png"></div>
+        <div class="col"><img src="img/SSP5.png"><br>New development by 2100</div>
+    </div>
+</section>
+<section>
+    <h2>Automatic fitting of densification curves</h2>
+   
+    <div class="container">
+        <div class="col"><img src="img/log.png"></div>
+        <div class="col"><img src="img/log2.png"></div>
+    </div>
+    Which curve do we fit?
+
+</section>
+<section>
+    <h2>LCMAP or NLCD?</h2>
+    Similar products:
+    <img src="img/LCMAP.png">
+    LCMAP: completely automated, 33-year historical period
+        <img src="img/NLCD.png">
+        NLCD: higher level of thematic detail
+</section>
+<section>
+    <h2>LCMAP: decline in developed area</h2>
+
+    <div class="container">
+        <div class="col"><img src="img/demand_20020_NLCD.png"></div>
+        <div class="col"><img src="img/demand_20020_LCMAP.png"></div>
+    </div>
+    Dothan, AL Metro Area
+
+</section>
+<section>
+    <h2>NLCD vs LCMAP developed area trends</h2>
+
+    <div class="container">
+        <div class="col">NLCD<img src="img/LCMAPvsNLCD1.png"></div>
+        <div class="col">LCMAP<img src="img/LCMAPvsNLCD2.png"></div>
+    </div>
+    Trends in developed area and population in counties
+    (2001-2016)
+
+</section>
+<section><h1>Results</h1>(preliminary)</section>
+
+<section>
+    <h2>NE Raleigh by 2100</h2>
+    <div class="container">
+        <div class="col"><img src="img/raleigh_run1.png"></div>
+        <div class="col"><img src="img/raleigh_run2.png"></div>
+    </div>
+    2 runs with different random seeds
+</section>
+<section>
+    <h2>NE Raleigh: probability</h2>
+    <img src="img/raleigh_probability.png" class="stretch">
+</section>
+<section>
+    <h2>Atlanta</h2>
+    <img src="img/atlanta.png" class="stretch">
+</section>
+<section>
+    <h2>New York</h2>
+    <img src="img/newyork.png" class="stretch">
+</section>
+<section>
+    <h2>San Francisco</h2>
+    <img src="img/sanfran.png" class="stretch">
+</section>
+<section>
+    <h2>Phoenix</h2>
+    <img src="img/phoenix.png" class="stretch">
+</section>
+<section>
+    <h2>Houston</h2>
+    <img src="img/houston.png" class="stretch">
+</section>
+<section>
+    <h2>Karnes County, TX</h2>
+    <img src="img/texas.png" class="stretch">
+</section>
+<section>
+    <h2>North Dakota</h2>
+    <img src="img/dakota.png" class="stretch">
+</section>
+
+
+<section>
+<h2>Benchmark examples</h2>
+<ul>
+    <li>Simple raster algebra</li>
+        <ul>
+            <li>30 min without paralellization</li>
+            <li>10 min with tiling approach on 16 cores</li>
+        </ul>
+    <li>Stratified random sampling
+        <ul>
+            <li>approx 2 mil points, 30 rasters</li>
+            <li>2.6 hours on 200 cores</li>
+        </ul>
+    </li>
+    <li> FUTURES patch growing simulation
+        <ul>
+            <li>20-30 hours on 27 cores on 3 nodes with 120 GB each</li>
+            <li>simultaneosly running jobs with different random seeds</li>
+        </ul>
+    </li>
+</ul>
+</section>
+<section>
+    <h2>FUTURES v3</h2>
+    Incorporates flood hazard and response (retreat, adaptation) into modeling of future urbanization
+   <br>
+    <img src="img/charleston.png" class="stretch">
+</section>
+ -->
+<section>
+    <h2>Resources</h2>
+    <ul>
+        <li><a href="https://grasswiki.osgeo.org/wiki/FUTURES_land-change_modeling_for_evaluating_innovative_conservation_scenarios">Tutorial</li>
+        <li><a href="https://mybinder.org/v2/gh/ncsu-landscape-dynamics/futures-model-intro-notebook/main?urlpath=lab/tree/futures_triangle.ipynb">Try it in Jupyter Lab</a> </li>
+        <li><a href="https://github.com/ncsu-landscape-dynamics/GRASS_FUTURES">Code on GitHub</a> </li>    
+    </ul>
+    <p style="margin-top: 3em;">
+        <img src="img/ncstate.png" width="25%">&nbsp;&nbsp;
+    <img src="img/cga.png" width="40%"><br>
+    <a href="https://cnr.ncsu.edu/geospatial/engage/">geospatial.ncsu.edu/engage/</a>
+</section>
+
+            </div>
+        </div>
+
+        <script src="dist/reveal.js"></script>
+        <script src="plugin/notes/notes.js"></script>
+        <script src="plugin/markdown/markdown.js"></script>
+        <script src="plugin/highlight/highlight.js"></script>
+        <script src="plugin/math/math.js"></script>
+        <script src="plugin/chalkboard/plugin.js"></script>
+        <script>
+
+            // Full list of configuration options available here:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                hash: true,
+                // Display controls in the bottom right corner
+                controls: false,
+
+                // Display a presentation progress bar
+                progress: true,
+
+                center: true,
+
+                // Display the page number of the current slide
+                slideNumber: false,
+
+                // Enable the slide overview mode
+                overview: true,
+
+                // Turns fragments on and off globally
+                fragments: true,
+
+                // The "normal" size of the presentation, aspect ratio will be preserved
+                // when the presentation is scaled to fit different resolutions. Can be
+                // specified using percentage units.
+                // width: 960,
+                // height: 700,
+
+                // Factor of the display size that should remain empty around the content
+                margin: 0.05,  // increase?
+
+                // Bounds for smallest/largest possible scale to apply to content
+                minScale: 0.5,
+                maxScale: 5.0,
+
+                // Push each slide change to the browser history
+                history: true,
+                // Enable keyboard shortcuts for navigation
+                keyboard: true,
+
+                // Vertical centering of slides
+                center: true,
+
+                // Enables touch navigation on devices with touch input
+                touch: true,
+
+                // Loop the presentation
+                loop: false,
+                // Flags if the presentation is running in an embedded mode,
+                // i.e. contained within a limited portion of the screen
+                embedded: false,
+
+                // Number of milliseconds between automatically proceeding to the
+                // next slide, disabled when set to 0, this value can be overwritten
+                // by using a data-autoslide attribute on your slides
+                autoSlide: 0,
+
+                // Stop auto-sliding after user input
+                autoSlideStoppable: true,
+
+                // Enable slide navigation via mouse wheel
+                mouseWheel: false,
+
+                // Hides the address bar on mobile devices
+                hideAddressBar: true,
+
+                // Opens links in an iframe preview overlay
+                previewLinks: false,
+
+                // Slide transition
+                transition: 'none', // default/none/slide/concave/convex/zoom
+
+                // Transition speed
+                transitionSpeed: 'default', // default/fast/slow
+
+                // Transition style for full page slide backgrounds
+                backgroundTransition: 'none', // default/none/slide/concave/convex/zoom
+
+                // Number of slides away from the current that are visible
+                viewDistance: 3,
+
+                // Parallax background image
+                //parallaxBackgroundImage: '', // e.g. "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'"
+
+                // Parallax background size
+                //parallaxBackgroundSize: '' // CSS syntax, e.g. "2100px 900px"
+
+                chalkboard: {
+                    boardmarkerWidth: 3,
+                    chalkWidth: 7,
+                    chalkEffect: 1.0,
+                    src: null,
+                    readOnly: undefined,
+                    toggleChalkboardButton: true,
+                    toggleNotesButton: true,
+                    boardmarkers : [
+                        { color: 'rgba(220,20,60,1)', cursor: 'url(' + path + 'img/boardmarker-red.png), auto'},
+                        { color: 'rgba(255,140,0,1)', cursor: 'url(' + path + 'img/boardmarker-orange.png), auto'},
+                    ]
+                },
+
+                math: {
+                    mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
+                    config: 'TeX-AMS_HTML-full',
+                    // pass other options into `MathJax.Hub.Config()`
+                    TeX: { Macros: { RR: "{\\bf R}" } }
+                },
+
+                plugins: [
+                    RevealMath,
+                    RevealHighlight,
+                    RevealMarkdown,
+                    RevealChalkboard
+                ]
+            });
+        </script>
+    </body>
+</html>
