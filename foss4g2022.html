@@ -167,8 +167,9 @@
 
 <section>
     <h1>Tips for parallelization in GRASS GIS</h1>
+    
+    <img src="img/FUTURES_addon.png" width="40%">
     <h2>in the context of land change modeling</h2>
-    <img src="img/FUTURES_addon.png" class="stretch">
     <p style="margin-top: 0.5em">
         Anna Petrasova, Vaclav Petras
     </p>
@@ -180,7 +181,6 @@
         <a href="http://www.ncsu.edu/" title="NC State University">NC State University</a>
     </p>
     
-    <!-- <p><small>DOI, Open GIS Group, Dec 2nd, 2021</small></p> -->
 </section>
 
 
@@ -206,7 +206,7 @@
             <b>400+</b> <a href="https://grass.osgeo.org/grass-stable/manuals/addons/">addons</a></li>
         <li>Interfaces: graphical, command line, Python, C</li>
         <li>3rd party interfaces: actinia (REST API), R, QGIS, OGC WPS</li>
-        <li>All-in-one Software Suite
+        <!-- <li>All-in-one Software Suite -->
     </ul>
     <img src="img/gui_pink_viewshed.png" class="stretch">
 </section>
@@ -215,7 +215,7 @@
     <h2>GIS workflows</h2>
         <img src="img/g_gui_gmodeler_model_usle.png" height="">
         <br>
-    <p class="small">GRASS GIS modeler</p>
+    <p><small>GRASS GIS modeler</small></p>
     
 </section>
 
@@ -296,7 +296,10 @@
         ...
         </code></pre>
      
-<p> Beware race conditions, valgrind is your friend.
+<!-- <p> Beware race conditions, valgrind is your friend. -->
+<p>Authors of OpenMP code:  <a href="https://doi.org/10.1016/j.cageo.2017.07.007">Hofierka et al. 2017</a> and
+    Aaron Saw Min Sern (<a href="https://trac.osgeo.org/grass/wiki/GSoC/2021/RasterParallelization">Google Summer of Code 2021</a>)
+    
 
 </section>
 <section>
@@ -308,24 +311,68 @@
 
 <section>
     <h2>More benchmarks</h2>
+    <p>12 cores, 2 billion cells <small>Southeast US at 30 m resolution, System76 Thelio with Ubuntu 20.04</small>
     <table>
         <tr>
-          <th>module</th>
-          <th>parallel processing time</th>
-          <th>speedup for 12 cores</th>
-        </tr>
-        <tr>
-          <td>r.neighbors</td>
-          <td></td>
-          <td></td>
+          <th>tool</th>
+          <th>window size</th>
+          <th>run time (MM:SS)</th>
+          <th>speedup</th>
+          <th>efficiency</th>
         </tr>
         <tr>
           <td>r.slope.aspect</td>
-          <td></td>
-          <td></td>
+          <td>3 x 3</td>
+          <td>00:32</td>
+          <td>2.7</td>
+          <td>22.6 %</td>
         </tr>
+        <tr>
+          <td>r.neighbors</td>
+          <td>37 x 37</td>
+          <td>09:16</td>
+          <td>10.1</td>
+          <td>83.8 %</td>
+        </tr>
+        <tr>
+          <td>r.mfilter</td>
+          <td>61 x 61</td>
+          <td>48:33</td>
+          <td>11.2</td>
+          <td>93.4 %</td>
+          </tr>
       </table>
-    <p>Use more cores for larger window sizes</p>
+    
+</section>
+
+<section>
+    <h2>Even more benchmarks in manual pages</h2>
+
+    <div class="flexcontainer">
+        <div class="flexbox">
+            <a href="https://grass.osgeo.org/grass-stable/manuals/r.series.html">
+          <img src="https://grass.osgeo.org/grass-stable/manuals/r_series_benchmark_size.png">
+        </a>
+          <span>r.series</span>
+        </div>
+        <div class="flexbox">
+            <a href="https://grass.osgeo.org/grass-stable/manuals/r.patch.html">
+          <img src="https://grass.osgeo.org/grass-stable/manuals/r_patch_benchmark_size.png">
+        </a>
+          <span>r.patch</span>
+        </div>
+        <div class="flexbox">
+            <a href="https://grass.osgeo.org/grass-stable/manuals/r.neighbors.html">
+          <img src="https://grass.osgeo.org/grass-stable/manuals/r_neighbors_benchmark_nprocs.png">
+        </a>
+          <span>r.neighbors </span>
+        </div> 
+    </div>
+    <p><small>(derived with GRASS Benchmarking library)</small></p>
+      <br><br>
+      <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span> Use 4 cores to get most speed improvements with high parallel efficiency.</p>
+      <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span> Use more cores for r.neighbors and r.mfilter with large window sizes.</p>
+        
 </section>
 <!-- 
 <section>
