@@ -224,14 +224,14 @@
     <p> Tool-level parallelization
         <br>
         <pre><code data-trim data-noescape>r.neighbors input=elevation output=elevation_smoothed size=15 <mark> nprocs=4</mark></code></pre>
-        <img src="img/neighbors_example.png" width="70%">
+        <img src="img/neighbors_example.png" width="70%", style="margin: 0px">
     <p> Workflow-level parallelization<br>
         <pre><code data-trim data-noescape>
-            r.grow.distance input=urban distance=dist_to_urban &
+            r.grow.distance input=roads distance=dist_to_roads &
             r.grow.distance input=water distance=dist_to_water &
             r.grow.distance input=forest distance=dist_to_forest &
         </code></pre>
-        <img src="img/distance_example.png" width="70%">
+        <img src="img/distance_example.png" width="70%", style="margin: 0px">
     
 </section>
 
@@ -373,6 +373,65 @@
       <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span> Use 4 cores to get most speed improvements with high parallel efficiency.</p>
       <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span> Use more cores for r.neighbors and r.mfilter with large window sizes.</p>
         
+</section>
+
+<section>
+    <h2>Multiple independent tasks: Bash</h2>
+    <p> Run tasks in the background:
+    <pre ><code data-trim data-noescape>
+        r.grow.distance input=roads distance=dist_to_roads &
+        r.grow.distance input=water distance=dist_to_water &
+        r.grow.distance input=forest distance=dist_to_forest &
+    </code></pre>
+
+    <br>
+    <div class="fragment"><p>Run tasks with GNU Parallel (or alternatives)
+    <pre><code data-trim data-noescape>
+        echo r.grow.distance input=roads distance=dist_to_roads > jobs.txt
+        echo r.grow.distance input=water distance=dist_to_water >> jobs.txt
+        echo r.grow.distance input=forest distance=dist_to_forest >> jobs.txt
+        parallel --jobs 3 < jobs.txt
+    </code></pre></p></div>
+    <br>
+    <div class="fragment"><p>Run "hybrid" tasks:
+    <pre><code data-trim data-noescape>
+        r.neighbors input=forest output=forest_percentage size=37 nprocs=4 &
+        r.neighbors input=wetland output=wetland_percentage size=37 nprocs=4 &
+    </code></pre></p></div>
+</section>
+
+<section data-background-image="https://baharmon.github.io/images/governors-island/flooding.gif" data-background-opacity="0.4">
+    <h2>Multiple independent tasks: Python</h2>
+    <pre><code data-trim data-noescape>
+        from multiprocessing import Pool
+        import grass.script as gs
+
+        def inundate(level):
+            name = f"inundation_{level}"
+            gs.run_command("r.lake", elevation="elevation", lake=name,
+                           seed="seed", water_level=level)
+            return name
+
+        with Pool(processes=4) as pool:
+            maps = pool.map_async(inundate, range(0, 10)).get()
+    </code></pre>
+    <br>
+    <br>
+    <small><small>Animation credit: <a href="https://baharmon.github.io/flooding-in-grass">Brendan Harmon</a></small></small>
+</section>
+
+
+<section>
+    <h2>Multiple independent tasks (2)</h2>
+    <pre><code data-trim data-noescape>
+        grass --exec r.neighbors input= output= size=31 nprocs=4 &
+        r.neighbors input= output= size=31 nprocs=4 &
+    </code></pre>
+</section>
+
+
+<section>
+    <h2>Tips for running from Jupyter Notebooks</h2>
 </section>
 <!-- 
 <section>
