@@ -157,6 +157,9 @@
   line-height: 0.9;
 }
 
+mark {
+    background-color: #fdf4a0;
+}
 </style>
 
 
@@ -400,7 +403,8 @@
     </code></pre></p></div>
 </section>
 
-<section data-background-image="https://baharmon.github.io/images/governors-island/flooding.gif" data-background-opacity="0.4">
+<section data-background-image="img/inundation.gif" data-background-opacity="0.6">
+<!-- <section data-background-image="https://baharmon.github.io/images/governors-island/flooding.gif" data-background-opacity="0.4"> -->
     <h2>Multiple independent tasks: Python</h2>
     <pre><code data-trim data-noescape>
         from multiprocessing import Pool
@@ -417,21 +421,170 @@
     </code></pre>
     <br>
     <br>
-    <small><small>Animation credit: <a href="https://baharmon.github.io/flooding-in-grass">Brendan Harmon</a></small></small>
+    <!-- <small><small>Animation credit: <a href="https://baharmon.github.io/flooding-in-grass">Brendan Harmon</a></small></small> -->
 </section>
 
 
+
+
 <section>
-    <h2>Multiple independent tasks (2)</h2>
+    <h2>Tiling approach</h2>
     <pre><code data-trim data-noescape>
-        grass --exec r.neighbors input= output= size=31 nprocs=4 &
-        r.neighbors input= output= size=31 nprocs=4 &
+    from grass.pygrass.modules.grid import GridModule
+
+    grd = GridModule("v.to.rast", input="roads", output="roads", use="val",
+                     processes=4)
+    grd.run()
+    </code></pre>
+    <pre><code data-trim data-noescape>
+    r.mapcalc.tiled expression="log_dist = if (dist == 0, 0, log(dist))" nprocs=4
+    </code></pre>
+    <img src="img/tiling2.png" class="stretch">
+</section>
+
+<section>
+    <h2>Tips & Tricks</h2>
+</section>
+
+<section data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
+    <h2>Multiple tasks with different region</h2>
+    <pre><code data-trim data-noescape data-line-numbers>
+        import os
+        from multiprocessing import Pool
+        import grass.script as gs
+        
+        def viewshed(point):
+            x, y, cat = point
+            name = f"viewshed_{cat}"
+            os.environ["GRASS_REGION"] = gs.region_env(e=x + 300, w=x - 300,
+                                                       n=y + 300, s=y - 300,
+                                                       align="elevation")
+            gs.run_command("r.viewshed", input="elevation", output=name,
+                           coordinates=(x, y), max_distance=300)
+            return name
+        
+        # viewpoints = [(x1, y1, category1), (x2, y2, category2), ...]
+        with Pool(processes=4) as pool:
+            maps = pool.map_async(viewshed, viewpoints).get()
+    </code></pre>
+</section>
+<section data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
+    <h2>Multiple tasks with different region</h2>
+    <pre><code data-trim data-noescape data-line-numbers="8-10">
+        import os
+        from multiprocessing import Pool
+        import grass.script as gs
+        
+        def viewshed(point):
+            x, y, cat = point
+            name = f"viewshed_{cat}"
+            os.environ["GRASS_REGION"] = gs.region_env(e=x + 300, w=x - 300,
+                                                       n=y + 300, s=y - 300,
+                                                       align="elevation")
+            gs.run_command("r.viewshed", input="elevation", output=name,
+                           coordinates=(x, y), max_distance=300)
+            return name
+        
+        # viewpoints = [(x1, y1, category1), (x2, y2, category2), ...]
+        with Pool(processes=4) as pool:
+            maps = pool.map_async(viewshed, viewpoints).get()
+    </code></pre>
+</section>
+<section data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
+    <h2>Multiple tasks with different region</h2>
+    <pre><code data-trim data-noescape data-line-numbers="8-13">
+        import os
+        from multiprocessing import Pool
+        import grass.script as gs
+        
+        def viewshed(point):
+            x, y, cat = point
+            name = f"viewshed_{cat}"
+            <mark>env</mark> = os.environ.copy()
+            <mark>env</mark>["GRASS_REGION"] = gs.region_env(e=x + 300, w=x - 300,
+                                                n=y + 300, s=y - 300,
+                                                align="elevation")
+            gs.run_command("r.viewshed", input="elevation", output=name,
+                           coordinates=(x, y), max_distance=300, <mark>env=env</mark>)
+            return name
+        
+        # viewpoints = [(x1, y1, category1), (x2, y2, category2), ...]
+        with Pool(processes=4) as pool:
+            maps = pool.map_async(viewshed, viewpoints).get()
     </code></pre>
 </section>
 
+<section>
+    <h2>Tiling approach: large overhead</h2>
+    <p>Overhead from <strong>merging</strong> data and <strong>I/O</strong>:
+    <br>
+    <div style="font-size:80%;">
+    <table>
+        <tr>
+          <th>process (12 cores, 2 billion cells)</th>
+          <th>run time (MM:SS)</th>
+          <th>speedup</th>
+          <th>efficiency</th>
+        </tr>
+        <tr>
+          <td>rasterization with GridModule</td>
+          <td>00:35</td>
+          <td>1.9</td>
+          <td>16 %</td>
+        </tr>
+        <tr>
+          <td>r.mapcalc.tiled (simple expression)</td>
+          <td>00:39</td>
+          <td>1.8</td>
+          <td>15 %</td>
+        </tr>
+      </table>
+    </div>
+    <br><br>
+    <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span>Use for large data
+    <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span>Long running in-memory computations
+    <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span> Use r.mapcalc.tiled for complex raster algebra expressions
+
+</section>
 
 <section>
-    <h2>Tips for running from Jupyter Notebooks</h2>
+    <h2>Tiling approach: tiling scheme</h2>
+    <img class="fragment fade-out" data-fragment-index="1" src="img/tiling2.png" width="40%">
+    <img class="fragment fade-right" data-fragment-index="1" src="img/tiling1.png" width="40%">
+    <p class="fragment fade-right" data-fragment-index="1" style="vertical-align: center;"><span style="font-size: 150%">&#10152</span>Slice data horizontally
+</section>
+
+
+
+<section>
+    <h2>Running GRASS in non-interactive session</h2>
+    <p>Run module in existing mapset:
+    <pre><code data-trim data-noescape class="nohighlight">
+        grass ~/grassdata/US_albers/visibility <mark>--exec</mark> r.viewshed input=elevation ...
+        </code></pre>
+    <div class="fragment"><p>Run module in a newly created mapset:
+    <pre><code data-trim data-noescape  class="nohighlight">
+        grass <mark>-c</mark> ~/grassdata/US_albers/visibility --exec input=elevation ...
+    </code></pre></p></div>
+    <div class="fragment"><p>Run Python script in existing mapset:
+    <pre><code data-trim data-noescape  class="nohighlight">
+        grass ~/grassdata/US_albers/visibility --exec <mark>python viewshed_script.py</mark>
+    </code></pre></p></div>
+    <div class="fragment"><p>Run Python script in a temporary mapset:
+    <pre><code data-trim data-noescape  class="nohighlight">
+        grass <mark>--tmp-mapset</mark> ~/grassdata/US_albers/ --exec python viewshed_script.py
+    </code></pre></p></div>
+</section>
+
+<section>
+    <h2>Multiprocessing in Jupyter Notebooks</h2>
+    This may not work from Jupyter Notebook:
+   <img src="img/jupyter1.png" class="stretch">
+</section>
+<section>
+    <h2>Multiprocessing inJupyter Notebooks</h2>
+    
+   <img src="img/jupyter2.png" class="stretch">
 </section>
 <!-- 
 <section>
