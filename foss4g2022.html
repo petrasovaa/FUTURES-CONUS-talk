@@ -160,6 +160,7 @@
 mark {
     background-color: #fdf4a0;
 }
+
 </style>
 
 
@@ -579,6 +580,25 @@ mark {
 </section>
 
 <section>
+    <h2>Running GRASS commands in parallel</h2>
+    <p>Generate commands:</p>
+    <pre>jobs.sh<code data-trim data-noescape class="nohighlight">
+grass ~/grassdata/nc_spm_08_grass7/analysis1 --exec python myscript.py 1
+grass ~/grassdata/nc_spm_08_grass7/analysis2 --exec python myscript.py 2
+grass ~/grassdata/nc_spm_08_grass7/analysis3 --exec python myscript.py 3
+grass ~/grassdata/nc_spm_08_grass7/analysis4 --exec python myscript.py 4
+grass ~/grassdata/nc_spm_08_grass7/analysis5 --exec python myscript.py 5
+grass ~/grassdata/nc_spm_08_grass7/analysis6 --exec python myscript.py 6
+...
+</code></pre>
+
+Run in parallel:
+<pre><code data-trim data-noescape class="nohighlight">
+parallel --jobs 8 < jobs.sh
+</code></pre>
+</section>
+
+<section>
     <h2>Multiprocessing in Jupyter Notebooks</h2>
     This may not work from Jupyter Notebook:
    <img src="img/jupyter1.png" class="stretch">
@@ -588,6 +608,43 @@ mark {
     
    <img src="img/jupyter2.png" class="stretch">
 </section>
+
+
+<section>
+    <h2>Caveats: r.mask</h2>
+    <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span>
+    Do <strong>not</strong> use mask in parallel within the same mapset:</p>
+    <pre><code data-trim data-noescape class="nohighlight">
+        from multiprocessing import Pool
+        import grass.script as gs
+
+        def process(category):
+            <span style="color:red;">gs.run_command("r.mask", raster=f"mask_{category}")</span>
+            # do some other stuff
+
+        with Pool(processes=4) as pool:
+            maps = pool.map_async(process, range(0, 10)).get()
+    </code></pre>
+    This will be addressed in GRASS 8.3 with <a href="https://github.com/OSGeo/grass/pull/2390">PR 2390</a> and <a href="https://github.com/OSGeo/grass/pull/2392">PR 2392</a>
+</section>
+
+<section>
+    <h2>Caveats: r.reclass</h2>
+    <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span>
+    Do <strong>not</strong> reclassify from the same raster in parallel with r.reclass (creates virtual raster)</p>
+    <img src="img/reclass_to.png" class="stretch">
+</section>
+<section>
+    <h2>Caveats: r.reclass</h2>
+    <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span>
+    r.reclass creates backlinks by editing the raster file.<br>
+    
+        Instead, use e.g., r.recode to create a copy.</p>
+
+    
+    <img src="img/reclass_from.png" class="stretch">
+</section>
+
 
 <section>
     <h2>Scaling urban growth model</h2>
@@ -615,14 +672,13 @@ mark {
     <h2>FUTURES workflow</h2>
     
     <img src="img/futures_schema2.png" class="stretch">
-    <p>Parallelization workflow for Southeast US at 30-m resolution:
-    <p><a href="https://github.com/petrasovaa/parallel-GRASS-FUTURES-notebook">github.com/petrasovaa/parallel-GRASS-FUTURES-notebook</a>
 </section>
 
 <section>
-    <h2>FUTURES workflow</h2>
+    <h2>FUTURES case studies</h2>
     <p>Parallelized workflow for Southeast US at 30 m  (2 billion cells)
-    <ul><li><a href="https://github.com/petrasovaa/parallel-GRASS-FUTURES-notebook">github.com/petrasovaa/parallel-GRASS-FUTURES-notebook</a></li></ul></p>
+        <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span>
+    <a href="https://github.com/petrasovaa/parallel-GRASS-FUTURES-notebook">github.com/petrasovaa/parallel-GRASS-FUTURES-notebook</a></p>
 <br>
     <p>Scaled up to Contiguous US (16 billion cells) on institutional HPC</p>
         <img src="img/HPC_interaction.png" class="stretch"> 
@@ -776,10 +832,12 @@ mark {
 
 <section>
     <h2>Resources</h2>
+
     <ul>
-        <li><a href="https://grasswiki.osgeo.org/wiki/FUTURES_land-change_modeling_for_evaluating_innovative_conservation_scenarios">Tutorial</li>
-        <li><a href="https://mybinder.org/v2/gh/ncsu-landscape-dynamics/futures-model-intro-notebook/main?urlpath=lab/tree/futures_triangle.ipynb">Try it in Jupyter Lab</a> </li>
-        <li><a href="https://github.com/ncsu-landscape-dynamics/GRASS_FUTURES">Code on GitHub</a> </li>    
+        <li><a href="https://github.com/ncsu-geoforall-lab/grass-gis-workshop-foss4g-2022">GRASS FOSS4G 2022 workshop (parallelization tips)</a>
+        <li><a href="https://grasswiki.osgeo.org/wiki/FUTURES_land-change_modeling_for_evaluating_innovative_conservation_scenarios">FUTURES tutorial</li>
+        <li><a href="https://mybinder.org/v2/gh/ncsu-landscape-dynamics/futures-model-intro-notebook/main?urlpath=lab/tree/futures_triangle.ipynb">Try FUTURES in Jupyter Lab</a> </li>
+        <li><a href="https://github.com/ncsu-landscape-dynamics/GRASS_FUTURES">FUTURES on GitHub</a> </li>    
     </ul>
     <p style="margin-top: 3em;">
         <img src="img/ncstate.png" width="25%">&nbsp;&nbsp;
