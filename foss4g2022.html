@@ -172,9 +172,9 @@ mark {
 <section>
     <h1>Tips for parallelization in GRASS GIS</h1>
     
-    <img src="img/FUTURES_addon.png" width="40%">
-    <h2>in the context of land change modeling</h2>
-    <p style="margin-top: 0.5em">
+    <h2 style="margin-bottom: 1.5em">in the context of land change modeling</h2>
+    <img src="img/grass_logo_multiple.png" width="80%">
+    <p style="margin-top: 1.5em">
         Anna Petrasova, Vaclav Petras
     </p>
     <p class="title-foot">
@@ -191,9 +191,9 @@ mark {
 <section>
 <h2>Anna Petrasova</h2>
 <ul>
-    <li>BS &amp; MS in Geoinformatics, Czech Technical University in Prague
-    <li>PhD in Geospatial Analytics, NC State
-    <li>Geospatial Research Software Engineer at the Center for Geospatial Analytics, NC State
+    <!-- <li>BS &amp; MS in Geoinformatics, Czech Technical University in Prague
+    <li>PhD in Geospatial Analytics, NC State -->
+    <li>Geospatial Research Software Engineer at the Center for Geospatial Analytics, NC State University
     <li>GRASS GIS Development Team Member
     <li>GRASS GIS Project Steering Committee Member
     <li>Open Source Geospatial Foundation Charter Member
@@ -206,7 +206,7 @@ mark {
         <li>Open-source GIS and geoprocessing engine</li>
         <li>
             Processing tools:
-            <b>500+</b> <a href="https://grass.osgeo.org/grass-stable/manuals/full_index.html">in core</a>,
+            <b>400+</b> <a href="https://grass.osgeo.org/grass-stable/manuals/full_index.html">in core</a>,
             <b>400+</b> <a href="https://grass.osgeo.org/grass-stable/manuals/addons/">addons</a></li>
         <li>Interfaces: graphical, command line, Python, C</li>
         <li>3rd party interfaces: actinia (REST API), R, QGIS, OGC WPS</li>
@@ -301,8 +301,9 @@ mark {
         </code></pre>
      
 <!-- <p> Beware race conditions, valgrind is your friend. -->
-<p>Authors of OpenMP code:  <a href="https://doi.org/10.1016/j.cageo.2017.07.007">Hofierka et al. 2017</a> and
+<p style="font-size: 80%">Authors of OpenMP code:  <a href="https://doi.org/10.1016/j.cageo.2017.07.007">Hofierka et al. 2017</a> and
     Aaron Saw Min Sern (<a href="https://trac.osgeo.org/grass/wiki/GSoC/2021/RasterParallelization">Google Summer of Code 2021</a>)
+<p style="margin-top:1em"> More tools coming: r.resamp.interp, r.resamp.filter, r.univar
     
 
 </section>
@@ -648,6 +649,7 @@ parallel --jobs 8 < jobs.sh
 
 <section>
     <h2>Scaling urban growth model</h2>
+    <img src="img/FUTURES_addon.png" class="stretch">
     <!-- <img src="img/gui_pink_viewshed.png" class="stretch"> -->
 </section>
 
@@ -797,7 +799,7 @@ parallel --jobs 8 < jobs.sh
 
 
 
-<section>
+<!-- <section>
     <h2>NE Raleigh by 2100</h2>
     <div class="container">
         <div class="col"><img src="img/raleigh_run1.png"></div>
@@ -808,7 +810,7 @@ parallel --jobs 8 < jobs.sh
 <section>
     <h2>NE Raleigh: probability</h2>
     <img src="img/raleigh_probability.png" class="stretch">
-</section>
+</section> -->
 <section>
     <h2>Atlanta</h2>
     <img src="img/atlanta.png" class="stretch">
@@ -833,7 +835,8 @@ parallel --jobs 8 < jobs.sh
 <section>
     <h2>Resources</h2>
 
-    <ul>
+    <ul><li>This talk:</li>
+        <ul><li style="font-size: 80%;"><a href="https://petrasovaa.github.io/FUTURES-CONUS-talk/">petrasovaa.github.io/FUTURES-CONUS-talk/foss4g2022.html</a></li></ul>
         <li><a href="https://github.com/ncsu-geoforall-lab/grass-gis-workshop-foss4g-2022">GRASS FOSS4G 2022 workshop (parallelization tips)</a>
         <li><a href="https://grasswiki.osgeo.org/wiki/FUTURES_land-change_modeling_for_evaluating_innovative_conservation_scenarios">FUTURES tutorial</li>
         <li><a href="https://mybinder.org/v2/gh/ncsu-landscape-dynamics/futures-model-intro-notebook/main?urlpath=lab/tree/futures_triangle.ipynb">Try FUTURES in Jupyter Lab</a> </li>
