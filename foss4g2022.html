@@ -215,20 +215,23 @@ mark {
     <img src="img/gui_pink_viewshed.png" class="stretch">
 </section>
 
-<section>
+<!-- <section>
     <h2>GIS workflows</h2>
         <img src="img/g_gui_gmodeler_model_usle.png" height="">
         <br>
     <p><small>GRASS GIS modeler</small></p>
     
-</section>
+</section> -->
 
 <section>
     <h2>Intro to GRASS parallelization</h2>
+    <div >
     <p> Tool-level parallelization
         <br>
         <pre><code data-trim data-noescape>r.neighbors input=elevation output=elevation_smoothed size=15 <mark> nprocs=4</mark></code></pre>
         <img src="img/neighbors_example.png" width="70%", style="margin: 0px">
+    </div>
+    <div class="fragment">
     <p> Workflow-level parallelization<br>
         <pre><code data-trim data-noescape>
             r.grow.distance input=roads distance=dist_to_roads &
@@ -236,13 +239,40 @@ mark {
             r.grow.distance input=forest distance=dist_to_forest &
         </code></pre>
         <img src="img/distance_example.png" width="70%", style="margin: 0px">
+    </div> 
     
 </section>
 
 <section>
-    <h2>Parallel tools  <span style="font-size:70%">(GRASS GIS 8.2)</span></h2>
+    <h2>Multi-threading with OpenMP</h2>
+    <ul>
+        <li>parallelization of geospatial algorithms in C</li>
+        <li>relatively easy integration into existing source code</li>
+        <li>single code base for all platforms</li>
+    </ul>
+<pre><code data-trim data-noescape data-line-numbers="1,4,6">
+#pragma omp parallel if(threaded) private(row, col, i)
+    {
+        int t_id = 0;
+#if defined(_OPENMP)
+        t_id = omp_get_thread_num();
+#endif
+        struct input *in = inputs[t_id];
+        DCELL *val = values[t_id];
+        ...
+        </code></pre>
+     
+<!-- <p> Beware race conditions, valgrind is your friend. -->
+</section>
+
+<section>
+    <h2>OpenMP-enabled tools  <span style="font-size:70%">(GRASS GIS 8.2)</span></h2>
     <!-- C tools with OpenMP support (as of GRASS GIS 8.2) -->
     <div class="flexcontainer">
+        <div class="flexbox">
+            <img src="img/module_rslopeaspect.png">
+            <span>r.slope.aspect</span>
+          </div>
         <div class="flexbox">
           <img src="img/module_rneighbors.png">
           <span>r.neighbors</span>
@@ -250,10 +280,6 @@ mark {
         <div class="flexbox">
           <img src="img/module_rmfilter.png">
           <span>r.mfilter</span>
-        </div>
-        <div class="flexbox">
-          <img src="img/module_rslopeaspect.png">
-          <span>r.slope.aspect</span>
         </div>
         <div class="flexbox">
           <img src="img/module_rseries.png">
@@ -283,30 +309,55 @@ mark {
 </section>
 
 <section>
-    <h2>Multi-threading with OpenMP</h2>
-    <ul>
-        <li>relatively easy integration into existing source code</li>
-        <li>single code base for all platforms</li>
-    </ul>
-<pre><code data-trim data-noescape data-line-numbers="1,4,6">
-#pragma omp parallel if(threaded) private(row, col, i)
-    {
-        int t_id = 0;
-#if defined(_OPENMP)
-        t_id = omp_get_thread_num();
-#endif
-        struct input *in = inputs[t_id];
-        DCELL *val = values[t_id];
-        ...
-        </code></pre>
-     
-<!-- <p> Beware race conditions, valgrind is your friend. -->
-<p style="font-size: 80%">Authors of OpenMP code:  <a href="https://doi.org/10.1016/j.cageo.2017.07.007">Hofierka et al. 2017</a> and
-    Aaron Saw Min Sern (<a href="https://trac.osgeo.org/grass/wiki/GSoC/2021/RasterParallelization">Google Summer of Code 2021</a>)
-<p style="margin-top:1em"> More tools coming: r.resamp.interp, r.resamp.filter, r.univar
+    <h2>Even more OpenMP-enabled tools</span></h2>
+    <!-- C tools with OpenMP support (as of GRASS GIS 8.2) -->
     
+    <p style="margin-top:1em"> More tools coming in GRASS GIS 8.3:
 
+    <div class="flexcontainer">
+        <div class="flexbox">
+          <img src="img/module_rneighbors.png">
+          <span>r.resamp.interp</span>
+        </div>
+        <div class="flexbox">
+          <img src="img/module_rmfilter.png">
+          <span>r.resamp.filter</span>
+        </div>
+        <div class="flexbox">
+            <img src="img/module_runivar.png">
+            <span>r.univar</span>
+          </div> 
+      </div>
+      <p>Authors of OpenMP code:<br>  <a href="https://doi.org/10.1016/j.cageo.2017.07.007">Hofierka et al. 2017</a> and
+        Aaron Saw Min Sern (<a href="https://trac.osgeo.org/grass/wiki/GSoC/2021/RasterParallelization">GSoC 2021</a>)
 </section>
+
+
+
+<section data-background-image="img/inundation.gif" data-background-opacity="0.4">
+    <!-- <section data-background-image="https://baharmon.github.io/images/governors-island/flooding.gif" data-background-opacity="0.4"> -->
+        <h2>Multi-processing with Python</h2>
+    <p>Typically used for multiple independent tasks:
+        <pre><code data-trim data-noescape>
+            from multiprocessing import Pool
+            import grass.script as gs
+    
+            def inundate(level):
+                name = f"inundation_{level}"
+                gs.run_command("r.lake", elevation="elevation", lake=name,
+                               seed="seed", water_level=level)
+                return name
+    
+            with Pool(processes=4) as pool:
+                maps = pool.map_async(inundate, range(0, 10)).get()
+        </code></pre>
+
+        Used by tools in GRASS and GRASS Addons: <br>
+        r.sun.daily, r.in.usgs, t.rast.what, r.viewshed.exposure, ...
+
+
+    </section>
+
 
 <section>
     <h2>Multiple independent tasks: Bash</h2>
@@ -333,29 +384,6 @@ mark {
     </code></pre></p></div>
 </section>
 
-<section data-background-image="img/inundation.gif" data-background-opacity="0.6">
-<!-- <section data-background-image="https://baharmon.github.io/images/governors-island/flooding.gif" data-background-opacity="0.4"> -->
-    <h2>Multiple independent tasks: Python</h2>
-    <pre><code data-trim data-noescape>
-        from multiprocessing import Pool
-        import grass.script as gs
-
-        def inundate(level):
-            name = f"inundation_{level}"
-            gs.run_command("r.lake", elevation="elevation", lake=name,
-                           seed="seed", water_level=level)
-            return name
-
-        with Pool(processes=4) as pool:
-            maps = pool.map_async(inundate, range(0, 10)).get()
-    </code></pre>
-    <br>
-    <br>
-    <!-- <small><small>Animation credit: <a href="https://baharmon.github.io/flooding-in-grass">Brendan Harmon</a></small></small> -->
-</section>
-
-
-
 
 <section>
     <h2>Tiling approach</h2>
@@ -372,7 +400,7 @@ mark {
 </section>
 
 <section>
-    <h2>Tips & Tricks</h2>
+    <h2>Tips & Tricks & Benchmarks</h2>
 </section>
 
 
@@ -664,17 +692,13 @@ parallel --jobs 8 < jobs.sh
         <li>stochastic, flexible (in terms of predictors, scenarios)</li>
         <li>implemented as r.futures tool set in GRASS Addons</li>
     </ul>
-    <img src="img/FUTURES_Raleigh.png" class="stretch">
+    <img src="img/futures_schema2.png" class="stretch">
+    <!-- <img src="img/FUTURES_Raleigh.png" class="stretch"> -->
     <p>
         <a href="https://cnr.ncsu.edu/geospatial/research/FUTURES/">cnr.ncsu.edu/geospatial/research/FUTURES</a>
 </section>
 
 
-<section>
-    <h2>FUTURES workflow</h2>
-    
-    <img src="img/futures_schema2.png" class="stretch">
-</section>
 
 <section>
     <h2>FUTURES case studies</h2>
