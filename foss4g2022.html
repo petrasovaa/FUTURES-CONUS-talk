@@ -184,7 +184,11 @@ mark {
         <br>
         <a href="http://www.ncsu.edu/" title="NC State University">NC State University</a>
     </p>
-    
+    <aside class="notes">
+        Good afternoon, in this presentation I will talk about parallelization techniques in GRASS
+         I used in my application, which is computing large scale urban growth projections.
+
+    </aside>
 </section>
 
 
@@ -198,6 +202,10 @@ mark {
     <li>GRASS GIS Project Steering Committee Member
     <li>Open Source Geospatial Foundation Charter Member
 </ul>
+<aside class="notes">
+    Just a brief introduction, my name is Anna Petrasova and I develop research software at the Center for Geospatial Analytics
+    at NCSU. I am a GRASS GIS user and developer.
+</aside>
 </section>
 
 <section>
@@ -213,6 +221,10 @@ mark {
         <!-- <li>All-in-one Software Suite -->
     </ul>
     <img src="img/gui_pink_viewshed.png" class="stretch">
+    <aside class="notes">
+        GRASS GIS is an open source GIS and also a geoprocessing engine with more than 400 hundred processing tools,
+        and various interfaces. Here I will be using Bash and Python API.
+    </aside>
 </section>
 
 <!-- <section>
@@ -240,7 +252,16 @@ mark {
         </code></pre>
         <img src="img/distance_example.png" width="70%", style="margin: 0px">
     </div> 
-    
+    <aside class="notes">
+        When we talk about parallelization in GIS, I think it's helpful to
+        distinguish between tool-level parallelization and workflow-level
+        parallelization.
+        ...
+        When you consider an entire GIS workflow, you may be able to parallelize it
+        even when the individual tools are not parallelized internally.
+
+        
+    </aside>
 </section>
 
 <section>
@@ -261,7 +282,10 @@ mark {
         DCELL *val = values[t_id];
         ...
         </code></pre>
-     
+    <aside class="notes">
+        So first let's look at tool-level parallelization in GRASS. There are 2 ways,
+        either multi-threading with OpenMP, or multi-processing with Python.
+    </aside>
 <!-- <p> Beware race conditions, valgrind is your friend. -->
 </section>
 
@@ -336,8 +360,8 @@ mark {
 <section>
         <h2>Multi-processing with Python</h2>
         <ul>
-            <li>separate OS processes</li>
             <li><em>multiprocessing</em> package and others</li>
+            <li>separate OS processes</li>
         </ul>
         <pre><code data-trim data-noescape data-line-numbers="1,6,7">
             from multiprocessing import Pool
@@ -349,7 +373,7 @@ mark {
                 pool.map_async(compute, range(0, 10))
         </code></pre>
 
-        Used by GRASS tools Addons calling other GRASS tools: <br><br>
+        Used by GRASS tools and addons calling other GRASS tools: <br><br>
         r.sun.daily, r.in.usgs, t.rast.what, r.viewshed.exposure, ...
 </section>
 
@@ -421,46 +445,13 @@ mark {
 
 <section>
     <h2>r.neighbors benchmark <span style="font-size:60%">400 million cells</span></h2>
-    <img src="img/benchmark.svg" class="stretch">
     <p style="font-size:60%">\[\mbox{parallel efficiency} = \frac{\mbox{serial processing time}}{N \times \mbox{parallel processing time with N cores}} \]</p>
+    <img src="img/benchmark.svg" class="stretch">
+    <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span> Use more cores for r.neighbors and r.mfilter with large window sizes.</p>
     
 </section>
 
-<section>
-    <h2>More benchmarks</h2>
-    <p>12 cores, 2 billion cells <small>Southeast US at 30 m resolution, System76 Thelio with Ubuntu 20.04</small>
-    <table>
-        <tr>
-          <th>tool</th>
-          <th>window size</th>
-          <th>run time (MM:SS)</th>
-          <th>speedup</th>
-          <th>efficiency</th>
-        </tr>
-        <tr>
-          <td>r.slope.aspect</td>
-          <td>3 x 3</td>
-          <td>00:32</td>
-          <td>2.7</td>
-          <td>22.6 %</td>
-        </tr>
-        <tr>
-          <td>r.neighbors</td>
-          <td>37 x 37</td>
-          <td>09:16</td>
-          <td>10.1</td>
-          <td>83.8 %</td>
-        </tr>
-        <tr>
-          <td>r.mfilter</td>
-          <td>61 x 61</td>
-          <td>48:33</td>
-          <td>11.2</td>
-          <td>93.4 %</td>
-          </tr>
-      </table>
-    
-</section>
+
 
 <section>
     <h2>Even more benchmarks in manual pages</h2>
@@ -487,8 +478,8 @@ mark {
     </div>
     <p><small>(derived with GRASS Benchmarking library)</small></p>
       <br><br>
+
       <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span> Use 4 cores to get most speed improvements with high parallel efficiency.</p>
-      <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span> Use more cores for r.neighbors and r.mfilter with large window sizes.</p>
         
 </section>
 
@@ -642,19 +633,10 @@ parallel --jobs 8 < jobs.sh
 </code></pre>
 </section>
 
-<section>
-    <h2>Multiprocessing in Jupyter Notebooks</h2>
-    This may not work from Jupyter Notebook:
-   <img src="img/jupyter1.png" class="stretch">
-</section>
-<section>
-    <h2>Multiprocessing in Jupyter Notebooks</h2>
-    
-   <img src="img/jupyter2.png" class="stretch">
-</section>
 
 
-<section>
+
+<section >
     <h2>Caveats: r.mask</h2>
     <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span>
     Do <strong>not</strong> use mask in parallel within the same mapset:</p>
@@ -678,7 +660,7 @@ parallel --jobs 8 < jobs.sh
     Do <strong>not</strong> reclassify from the same raster in parallel with r.reclass (creates virtual raster)</p>
     <img src="img/reclass_to.png" class="stretch">
 </section>
-<section>
+<section data-transition="none" >
     <h2>Caveats: r.reclass</h2>
     <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span>
     r.reclass creates backlinks by editing the raster file.<br>
@@ -688,7 +670,16 @@ parallel --jobs 8 < jobs.sh
     
     <img src="img/reclass_from.png" class="stretch">
 </section>
-
+<section>
+    <h2>Multiprocessing in Jupyter Notebooks</h2>
+    This may not work from Jupyter Notebook:
+   <img src="img/jupyter1.png" class="stretch">
+</section>
+<section>
+    <h2>Multiprocessing in Jupyter Notebooks</h2>
+    
+   <img src="img/jupyter2.png" class="stretch">
+</section>
 
 <section>
     <h2>Scaling urban growth model</h2>
@@ -887,6 +878,41 @@ parallel --jobs 8 < jobs.sh
     <a href="https://cnr.ncsu.edu/geospatial/engage/">geospatial.ncsu.edu/engage/</a>
 </section>
 
+<section>
+    <h2>More benchmarks</h2>
+    <p>12 cores, 2 billion cells <small>Southeast US at 30 m resolution, System76 Thelio with Ubuntu 20.04</small>
+    <table>
+        <tr>
+          <th>tool</th>
+          <th>window size</th>
+          <th>run time (MM:SS)</th>
+          <th>speedup</th>
+          <th>efficiency</th>
+        </tr>
+        <tr>
+          <td>r.slope.aspect</td>
+          <td>3 x 3</td>
+          <td>00:32</td>
+          <td>2.7</td>
+          <td>22.6 %</td>
+        </tr>
+        <tr>
+          <td>r.neighbors</td>
+          <td>37 x 37</td>
+          <td>09:16</td>
+          <td>10.1</td>
+          <td>83.8 %</td>
+        </tr>
+        <tr>
+          <td>r.mfilter</td>
+          <td>61 x 61</td>
+          <td>48:33</td>
+          <td>11.2</td>
+          <td>93.4 %</td>
+          </tr>
+      </table>
+    
+</section>
 <!-- 
 
 
@@ -1365,7 +1391,7 @@ parallel --jobs 8 < jobs.sh
                 previewLinks: false,
 
                 // Slide transition
-                transition: 'slide', // default/none/slide/concave/convex/zoom
+                transition: 'none', // default/none/slide/concave/convex/zoom
 
                 // Transition speed
                 transitionSpeed: 'default', // default/fast/slow
@@ -1407,6 +1433,7 @@ parallel --jobs 8 < jobs.sh
                     RevealMath,
                     RevealHighlight,
                     RevealMarkdown,
+                    RevealNotes,
                     RevealChalkboard
                 ]
             });
