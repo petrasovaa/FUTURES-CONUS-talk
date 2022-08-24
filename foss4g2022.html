@@ -333,11 +333,30 @@ mark {
 </section>
 
 
+<section>
+        <h2>Multi-processing with Python</h2>
+        <ul>
+            <li>separate OS processes</li>
+            <li><em>multiprocessing</em> package and others</li>
+        </ul>
+        <pre><code data-trim data-noescape data-line-numbers="1,6,7">
+            from multiprocessing import Pool
+    
+            def compute(value):
+                # do something with the value
+    
+            with Pool(processes=4) as pool:
+                pool.map_async(compute, range(0, 10))
+        </code></pre>
+
+        Used by GRASS tools Addons calling other GRASS tools: <br><br>
+        r.sun.daily, r.in.usgs, t.rast.what, r.viewshed.exposure, ...
+</section>
+
 
 <section data-background-image="img/inundation.gif" data-background-opacity="0.4">
     <!-- <section data-background-image="https://baharmon.github.io/images/governors-island/flooding.gif" data-background-opacity="0.4"> -->
-        <h2>Multi-processing with Python</h2>
-    <p>Typically used for multiple independent tasks:
+        <h2>Multiple independent tasks: Python</h2>
         <pre><code data-trim data-noescape>
             from multiprocessing import Pool
             import grass.script as gs
@@ -351,12 +370,7 @@ mark {
             with Pool(processes=4) as pool:
                 maps = pool.map_async(inundate, range(0, 10)).get()
         </code></pre>
-
-        Used by tools in GRASS and GRASS Addons: <br>
-        r.sun.daily, r.in.usgs, t.rast.what, r.viewshed.exposure, ...
-
-
-    </section>
+</section>
 
 
 <section>
@@ -390,11 +404,12 @@ mark {
     <pre><code data-trim data-noescape>
     from grass.pygrass.modules.grid import GridModule
 
-    grd = GridModule("v.to.rast", input="roads", output="roads", use="val", processes=4)
+    grd = GridModule("v.to.rast", input="roads", output="roads",
+                     use="val", processes=4)
     grd.run()
     </code></pre>
     <pre><code data-trim data-noescape>
-    r.mapcalc.tiled expression="log_dist = if (dist == 0, 0, log(dist))" nprocs=4
+    r.mapcalc.tiled "log_dist = if (dist == 0, 0, log(dist))" nprocs=4
     </code></pre>
     <img src="img/tiling2.png" class="stretch">
 </section>
@@ -478,7 +493,7 @@ mark {
 </section>
 
 
-<section data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
+<section data-transition="none" data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
     <h2>Multiple tasks with different region</h2>
     <pre><code data-trim data-noescape data-line-numbers>
         import os
@@ -500,7 +515,7 @@ mark {
             maps = pool.map_async(viewshed, viewpoints).get()
     </code></pre>
 </section>
-<section data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
+<section data-transition="none" data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
     <h2>Multiple tasks with different region</h2>
     <pre><code data-trim data-noescape data-line-numbers="8-10">
         import os
@@ -522,7 +537,7 @@ mark {
             maps = pool.map_async(viewshed, viewpoints).get()
     </code></pre>
 </section>
-<section data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
+<section data-transition="none" data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
     <h2>Multiple tasks with different region</h2>
     <pre><code data-trim data-noescape data-line-numbers="8-13">
         import os
@@ -716,7 +731,7 @@ parallel --jobs 8 < jobs.sh
     <!-- Our goal was to get it computed in <em>reasonable time</em>... -->
 
     <br>
-    <p>r.futures.devpressure (internally uses r.mfilter) for CONUS
+    <p>r.futures.devpressure (internally uses r.mfilter)
     <table>
         <tr>
           <th>window size</th>
@@ -739,7 +754,7 @@ parallel --jobs 8 < jobs.sh
     <!-- Our goal was to get it computed in <em>reasonable time</em>... -->
 
     <br>
-    <p>CONUS (16 billion cells)
+<!--    <p>CONUS (16 billion cells)-->
     <table>
         <tr>
           <th>tool</th>
@@ -767,8 +782,8 @@ parallel --jobs 8 < jobs.sh
 <section>
     <h2>Parallelization by US states</h2>
     <ul>
-        <li>CONUS simulation doesn't fit into memory</li>
-        <li>the simulation itself is not parallelized</li>
+        <li>simulation doesn't fit into memory</li>
+        <li>simulation itself is not parallelized</li>
         <li>we need a lot of stochastic runs</li>
     </ul>
     <img src="img/split-apply-merge.svg" class="stretch">
@@ -1286,10 +1301,10 @@ parallel --jobs 8 < jobs.sh
             Reveal.initialize({
                 hash: true,
                 // Display controls in the bottom right corner
-                controls: false,
+                controls: true,
 
                 // Display a presentation progress bar
-                progress: true,
+                progress: false,
 
                 center: true,
 
@@ -1341,7 +1356,7 @@ parallel --jobs 8 < jobs.sh
                 autoSlideStoppable: true,
 
                 // Enable slide navigation via mouse wheel
-                mouseWheel: false,
+                mouseWheel: true,
 
                 // Hides the address bar on mobile devices
                 hideAddressBar: true,
@@ -1350,7 +1365,7 @@ parallel --jobs 8 < jobs.sh
                 previewLinks: false,
 
                 // Slide transition
-                transition: 'none', // default/none/slide/concave/convex/zoom
+                transition: 'slide', // default/none/slide/concave/convex/zoom
 
                 // Transition speed
                 transitionSpeed: 'default', // default/fast/slow
