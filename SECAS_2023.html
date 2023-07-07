@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>Scaling up urban growth projections with FUTURES (SECAS & SECASC, 2023)</title>
+
+        <meta name="description" content="FUTURES slides for SECAS">
+        <meta name="author" content="Anna Petrasova">
+
+        <link rel="stylesheet" href="dist/reset.css">
+        <link rel="stylesheet" href="dist/reveal.css">
+        <link rel="stylesheet" href="css/theme/osgeo.css" id="theme">
+        <link rel="stylesheet" href="css/nouislider.min.css" id="slide">
+
+        <!-- Theme used for syntax highlighted code -->
+        <link rel="stylesheet" href="plugin/highlight/monokai.css" id="highlight-theme">
+        <!-- For chalkboard plugin -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+        <!-- If the query includes 'print-pdf', include the PDF print sheet -->
+        <script>
+            if( window.location.search.match( /print-pdf/gi ) ) {
+                var link = document.createElement( 'link' );
+                link.rel = 'stylesheet';
+                link.type = 'text/css';
+                link.href = 'css/print/pdf.css';
+                document.getElementsByTagName( 'head' )[0].appendChild( link );
+            }
+        </script>
+
+<!--        <link href="https://fonts.googleapis.com/css?family=Miriam+Libre" rel="stylesheet">-->
+<style>
+/* miriam-libre-regular - latin */
+@font-face {
+  font-family: 'Miriam Libre';
+  font-style: normal;
+  font-weight: 400;
+  src: url('lib/font/miriam-libre/miriam-libre-v1-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Miriam Libre'), local('MiriamLibre-Regular'),
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-regular.svg#MiriamLibre') format('svg'); /* Legacy iOS */
+}
+
+/* miriam-libre-700 - latin */
+@font-face {
+  font-family: 'Miriam Libre';
+  font-style: normal;
+  font-weight: 700;
+  src: url('lib/font/miriam-libre/miriam-libre-v1-latin-700.eot'); /* IE9 Compat Modes */
+  src: local('Miriam Libre Bold'), local('MiriamLibre-Bold'),
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-700.woff') format('woff'), /* Modern Browsers */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('lib/font/miriam-libre/miriam-libre-v1-latin-700.svg#MiriamLibre') format('svg'); /* Legacy iOS */
+}
+
+
+/* sintony-regular - latin */
+@font-face {
+  font-family: 'Sintony';
+  font-style: normal;
+  font-weight: 400;
+  src: url('lib/font/sintony/sintony-v4-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Sintony'),
+       url('lib/font/sintony/sintony-v4-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('lib/font/sintony/sintony-v4-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('lib/font/sintony/sintony-v4-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('lib/font/sintony/sintony-v4-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('lib/font/sintony/sintony-v4-latin-regular.svg#Sintony') format('svg'); /* Legacy iOS */
+}
+
+/* sintony-700 - latin */
+@font-face {
+  font-family: 'Sintony';
+  font-style: normal;
+  font-weight: 700;
+  src: url('lib/font/sintony/sintony-v4-latin-700.eot'); /* IE9 Compat Modes */
+  src: local('Sintony Bold'), local('Sintony-Bold'),
+       url('lib/font/sintony/sintony-v4-latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('lib/font/sintony/sintony-v4-latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+       url('lib/font/sintony/sintony-v4-latin-700.woff') format('woff'), /* Modern Browsers */
+       url('lib/font/sintony/sintony-v4-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('lib/font/sintony/sintony-v4-latin-700.svg#Sintony') format('svg'); /* Legacy iOS */
+}
+
+.reveal li > ul {
+    font-size: 85%;
+    line-height: 110%;
+  }
+
+.reveal small {
+  display: inline-block;
+  font-size: smaller;
+  line-height: 1.2em;
+  vertical-align: baseline;
+  margin: 0.1em; }
+
+.reveal small * {
+  vertical-align: baseline; }
+
+.reveal .credit {
+  font-size: small;
+  color: gray;
+  margin: 0.1em;
+}
+
+.reveal .right, .reveal .textimg > img, .reveal .textimg > video, .reveal .textimg > iframe, .reveal .imgtext > p, .reveal .imgtext > ul, .reveal .imgtext > ol, .reveal .imgtext > div {
+    float: right;
+    text-align: left;
+    max-width: 47%;
+}
+
+.reveal .left, .reveal .imgtext > img, .reveal .imgtext > video, .reveal .imgtext > iframe, .reveal .textimg > p, .reveal .textimg > ul, .reveal .textimg > ol, .reveal .textimg > div {
+    float: left;
+    text-align: left;
+    max-width: 47%;
+}
+</style>
+
+
+    </head>
+    <body>
+        <div class="reveal">
+            <div class="slides">
+
+<section>
+    <h1>Scaling up Urban Growth Projections with FUTURES</h1>
+    <p style="margin-top: 0.5em">
+        Anna Petrasova
+    </p>
+    <p class="title-foot">
+        <!-- <a href="http://geospatial.ncsu.edu/geoforall/" title="NCSU GeoForAll Lab">NCSU GeoForAll Lab</a>
+        at the -->
+        <a href="http://geospatial.ncsu.edu/" title="NCSU Center for Geospatial Analytics">Center for Geospatial Analytics</a>
+        <br>
+        <a href="http://www.ncsu.edu/" title="NC State University">NC State University</a>
+    </p>
+    <img src="img/FUTURES_addon.png" class="stretch">
+    <p><small>June 20th, 2023</small></p>
+</section>
+
+
+<section>
+<h2>Anna Petrasova</h2>
+<ul>
+    <img class="bio-img" src="img/bio.jpg" alt="Pic of Anna Petrasova">
+    <li>Geospatial Research Software Engineer at the Center for Geospatial Analytics</li>
+    <li>PhD in Geospatial Analytics, NC State</li>
+    <li>GRASS GIS Development Team  and Project Steering Committee Member</li>
+</ul>
+</section>
+
+
+<section>
+    <h2>CONUS urban growth projections</h2>
+  <!-- animated picture of CONUS dataset with zoomin -->
+  <!-- Talk about what it is, how we created it and how to use it -->
+</section>
+
+<section data-background="img/background1.png">
+    <h2>Motivation</h2>
+    <ul>
+        <li>provide <strong>detailed</strong> national urbanization projections</li>
+        <li>study urbanization <strong>trends</strong> inside and outside of <strong>floodplain</strong></li>
+        <li>available <strong>datasets</strong> (NLCD time-series, etc.), computing <strong>infrastructure</strong>, and scalable <strong>model</strong></li>
+    </ul>
+
+</section>
+
+
+<section>
+    <h2>Data product</h2>
+    <ul>
+        <li>future urban growth from <strong>2020 to 2100</strong></li>
+        <li>across <strong>CONUS at 30-m</strong> resolution</li>
+        <li><strong>SSP2</strong> &ldquo;middle of the road&rdquo; scenario of growth</li>
+        <li><strong>50 stochastic</strong> iterations at annual time steps</li>
+        <li>derived <strong>probabilities</strong> from all / new only development at decadal time steps</li>
+    </ul>
+    <p>Accessible from <a href="https://www.sciencebase.gov/catalog/item/63f50297d34efa0476b04cf7">ScienceBase Catalog</a> or from <small>
+        <a href="https://geospatial.ncsu.edu/research/FUTURES">geospatial.ncsu.edu/research/FUTURES</a></small>
+</section>
+
+<section><h2>Input Data</h2></section>
+<section>
+    <h2>Land cover</h2>
+        NLCD 2001 - 2019
+        <img src="img/nlcd.png">
+        Land cover (urban, forest, water, wetlands)
+        <img src="img/nlcd_descriptor.png">
+        Impervious descriptor (roads)
+</section>
+<section>
+    <h2>Population</h2>
+    <ul>
+        <li>past population  <a href="https://seer.cancer.gov/popdata/download.html">(SEER)</a></li>
+        <li>county level population projections <a href="https://www.nature.com/articles/sdata20195"></a>(Hauer et al. 2019)</a></li>
+        <li>shared socioeconomic pathway SSP2 (Middle of the Road)</li>
+    </ul>
+    <img src="img/SSP.png" class="stretch"><br>
+    <small>source: Hauer et al 2019</small>
+</section>
+<section>
+    <h2>Predictors</h2>
+    <ul>
+        <li>NED DEM (USGS)</li>
+        <li>protected areas (PAD-US by USGS)</li>
+        <li>USA National Commodity Crop Productivity Index</a></li>
+        <li><a href="https://svi.cdc.gov/">CDC Social Vulnerability Index</a></li>
+        <li>FEMA floodplain</li>
+        <li>boundary datasets: counties, metropolitan statistical areas
+    </ul>
+    <img src="img/svimap.png" class="stretch"><br>
+    <small>SVI, source: CDC</small>
+</section>
+
+<section><h2>Modeling</h2></section>
+
+<section>
+    <h2>FUTURES</h2>
+    <ul>
+        <li><b>FUT</b>ure <b>U</b>rban-<b>R</b>egional <b>E</b>nvironment <b>S</b>imulation</li>
+        <li><strong>stochastic, patch-based</strong> urban growth model</li>
+        <li>explicitly captures the <strong>spatial structure</strong> of development</li>
+        <li><strong>flexible</strong> in terms of predictors and scenarios</li>
+    </ul>
+    <img src="img/FUTURES_schema.png" class="stretch">
+</section>
+
+
+<section>
+    <h2>Where to develop?</h2>
+    <ol>
+        <li>Derive predictors (distance to water, roads, forest, SVI, crop index, slope)</li>
+        <li>Derive newly developed pixels (raster algebra)</li>
+        <li>Sample predictors (2,000,000 points)</li>
+        <li>Run logistic regression for different combinations of predictors</li>
+        <li>Create development suitability surface</li>
+    </ol>
+    <img src="img/potential.png" class="stretch">
+</section>
+<section>
+    <h2>How much land?</h2>
+    <p>
+    Projects land consumption for each year and county
+    based on NLCD and past and projected population:
+    <br>
+    <div class="container">
+        <div class="col"><img src="img/demand_Raleigh.png"><br>Raleigh-Cary Metro Area</div>
+        <div class="col"><img src="img/demand_NC.png">NC</div>
+    </div>
+    
+</section>
+<section>
+    <h2>What is the size and shape?</h2>
+    <ol>
+        <li>Calibrate patch size and compactness from past urban change</li>
+        <li>Grow patches in suitable areas until demand met</li>
+    </ol>
+    <img src="img/PGA.gif" class="stretch">
+</section>
+
+<section>
+    <h2>FUTURES software</h2>
+    <div class="container">
+        <div class="col">
+    <ul>
+        <li>open source GRASS GIS addon</li>
+        <li>set of tools r.futures.*</li>
+        <li>written in C and Python</li>
+        <li>runs on all platforms</li>
+    </ul></div>
+    <div class="col">
+        <!-- TODO: Image of GUI -->
+    <img src="img/grass_gis.svg" width="50%">
+    </div></div>
+    <br>
+    <small>Find more resources at <a href="https://geospatial.ncsu.edu/research/FUTURES">geospatial.ncsu.edu/research/FUTURES</a></small>
+</section>
+
+<section>
+    <h2>How to test it?</h2>
+    <p>Test using <a href="https://wholetale.org">The Whole Tale platform</a> for reproducible research
+
+    <ul>
+        <li>a small 3-county case study</li>
+        <li>runs online in Jupyter Lab, no installation</li>
+        <li>allows you to test and experiment</li>
+    </ul>
+    <br><img src="img/jupyter.png" class="stretch">
+    <br>
+    <small>Try at <a href="https://dashboard.wholetale.org/run/63f522f5b4a0197e9a9ee800">dashboard.wholetale.org/run/63f522f5b4a0197e9a9ee800</a></small>
+</section>
+
+<section>
+    <h2>Scaling</h2>
+    <ul>
+        <li>NCSU High Performance Computing cluster</li>
+        <li>Efficient memory handling and parallelization in GRASS GIS</li>
+        <li>Computation split by states along Metropolitan Statistical Areas boundaries</li>
+    </ul>
+    <img src="img/HPC_interaction.png" class="stretch">
+</section>
+
+
+<section>
+    <h2>Results</h2>
+</section>
+
+<section>
+    <h2>NE Raleigh by 2100</h2>
+    <div class="container">
+        <div class="col"><img src="img/raleigh_run1.png"></div>
+        <div class="col"><img src="img/raleigh_run2.png"></div>
+    </div>
+    2 runs with different random seeds
+</section>
+<section>
+    <h2>NE Raleigh: probability</h2>
+    <img src="img/raleigh_probability.png" class="stretch">
+</section>
+
+<section>
+    <h2>Validation</h2>
+</section>
+
+<section>
+    <h2>How to use this data?</h2>
+    <ul>
+        <li>For large scale analysis
+            <ul>
+                <li>Local analysis </li>
+            </ul>
+        </li>
+
+        <li>When possible, use stochastic runs directly
+            <ul>
+                <li></li>
+            </ul>
+        </li>
+    </ul>
+</section>
+
+<section><h1>Thank You!</h1></section>
+
+<section>
+    <h1>Challenges</h1>
+</section>
+<section>
+    <h2>GIS on HPC</h2>
+    <img src="img/HPC_interaction.png" class="stretch">
+</section>
+<section>
+    <h2>Parallelization by states</h2>
+    We needed to respect Metropolitan Statistical Areas boundaries:
+
+    <img src="img/MSA.png" class="stretch">
+</section>
+<section>
+    <h2>SSP5 scenario</h2>
+    <div class="container">
+        <div class="col"><img src="img/SSP.png"></div>
+        <div class="col"><img src="img/SSP5.png"><br>New development by 2100</div>
+    </div>
+</section>
+<section>
+    <h2>Automatic fitting of densification curves</h2>
+   
+    <div class="container">
+        <div class="col"><img src="img/log.png"></div>
+        <div class="col"><img src="img/log2.png"></div>
+    </div>
+    Which curve do we fit?
+
+</section>
+
+<section><h1>Results</h1>(preliminary)</section>
+
+<section>
+    <h2>NE Raleigh by 2100</h2>
+    <div class="container">
+        <div class="col"><img src="img/raleigh_run1.png"></div>
+        <div class="col"><img src="img/raleigh_run2.png"></div>
+    </div>
+    2 runs with different random seeds
+</section>
+<section>
+    <h2>NE Raleigh: probability</h2>
+    <img src="img/raleigh_probability.png" class="stretch">
+</section>
+<section>
+    <h2>Atlanta</h2>
+    <img src="img/atlanta.png" class="stretch">
+</section>
+<section>
+    <h2>New York</h2>
+    <img src="img/newyork.png" class="stretch">
+</section>
+<section>
+    <h2>San Francisco</h2>
+    <img src="img/sanfran.png" class="stretch">
+</section>
+<section>
+    <h2>Phoenix</h2>
+    <img src="img/phoenix.png" class="stretch">
+</section>
+<section>
+    <h2>Houston</h2>
+    <img src="img/houston.png" class="stretch">
+</section>
+<section>
+    <h2>Karnes County, TX</h2>
+    <img src="img/texas.png" class="stretch">
+</section>
+<section>
+    <h2>North Dakota</h2>
+    <img src="img/dakota.png" class="stretch">
+</section>
+
+
+<section>
+<h2>Benchmark examples</h2>
+<ul>
+    <li>Simple raster algebra</li>
+        <ul>
+            <li>30 min without paralellization</li>
+            <li>10 min with tiling approach on 16 cores</li>
+        </ul>
+    <li>Stratified random sampling
+        <ul>
+            <li>approx 2 mil points, 30 rasters</li>
+            <li>2.6 hours on 200 cores</li>
+        </ul>
+    </li>
+    <li> FUTURES patch growing simulation
+        <ul>
+            <li>20-30 hours on 27 cores on 3 nodes with 120 GB each</li>
+            <li>simultaneosly running jobs with different random seeds</li>
+        </ul>
+    </li>
+</ul>
+</section>
+<section>
+    <h2>FUTURES v3</h2>
+    Incorporates flood hazard and response (retreat, adaptation) into modeling of future urbanization
+   <br>
+    <img src="img/charleston.png" class="stretch">
+</section>
+<section>
+    <h2>Resources</h2>
+    <ul>
+        <li><a href="https://grasswiki.osgeo.org/wiki/FUTURES_land-change_modeling_for_evaluating_innovative_conservation_scenarios">Tutorial</li>
+        <li><a href="https://mybinder.org/v2/gh/ncsu-landscape-dynamics/futures-model-intro-notebook/main?urlpath=lab/tree/futures_triangle.ipynb">Try it in Jupyter Lab</a> </li>
+        <li><a href="https://github.com/ncsu-landscape-dynamics/GRASS_FUTURES">Code on GitHub</a> </li>    
+    </ul>
+    <p style="margin-top: 3em;">
+        <img src="img/ncstate.png" width="25%">&nbsp;&nbsp;
+    <img src="img/cga.png" width="40%"><br>
+    <a href="https://cnr.ncsu.edu/geospatial/engage/">geospatial.ncsu.edu/engage/</a>
+</section>
+
+            </div>
+        </div>
+
+        <script src="dist/reveal.js"></script>
+        <script src="plugin/notes/notes.js"></script>
+        <script src="plugin/markdown/markdown.js"></script>
+        <script src="plugin/highlight/highlight.js"></script>
+        <script src="plugin/math/math.js"></script>
+        <script src="plugin/chalkboard/plugin.js"></script>
+        <script>
+
+            // Full list of configuration options available here:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                hash: true,
+                // Display controls in the bottom right corner
+                controls: false,
+
+                // Display a presentation progress bar
+                progress: true,
+
+                center: true,
+
+                // Display the page number of the current slide
+                slideNumber: false,
+
+                // Enable the slide overview mode
+                overview: true,
+
+                // Turns fragments on and off globally
+                fragments: true,
+
+                // The "normal" size of the presentation, aspect ratio will be preserved
+                // when the presentation is scaled to fit different resolutions. Can be
+                // specified using percentage units.
+                // width: 960,
+                // height: 700,
+
+                // Factor of the display size that should remain empty around the content
+                margin: 0.05,  // increase?
+
+                // Bounds for smallest/largest possible scale to apply to content
+                minScale: 0.5,
+                maxScale: 5.0,
+
+                // Push each slide change to the browser history
+                history: true,
+                // Enable keyboard shortcuts for navigation
+                keyboard: true,
+
+                // Vertical centering of slides
+                center: true,
+
+                // Enables touch navigation on devices with touch input
+                touch: true,
+
+                // Loop the presentation
+                loop: false,
+                // Flags if the presentation is running in an embedded mode,
+                // i.e. contained within a limited portion of the screen
+                embedded: false,
+
+                // Number of milliseconds between automatically proceeding to the
+                // next slide, disabled when set to 0, this value can be overwritten
+                // by using a data-autoslide attribute on your slides
+                autoSlide: 0,
+
+                // Stop auto-sliding after user input
+                autoSlideStoppable: true,
+
+                // Enable slide navigation via mouse wheel
+                mouseWheel: false,
+
+                // Hides the address bar on mobile devices
+                hideAddressBar: true,
+
+                // Opens links in an iframe preview overlay
+                previewLinks: false,
+
+                // Slide transition
+                transition: 'none', // default/none/slide/concave/convex/zoom
+
+                // Transition speed
+                transitionSpeed: 'default', // default/fast/slow
+
+                // Transition style for full page slide backgrounds
+                backgroundTransition: 'none', // default/none/slide/concave/convex/zoom
+
+                // Number of slides away from the current that are visible
+                viewDistance: 3,
+
+                // Parallax background image
+                //parallaxBackgroundImage: '', // e.g. "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'"
+
+                // Parallax background size
+                //parallaxBackgroundSize: '' // CSS syntax, e.g. "2100px 900px"
+
+                chalkboard: {
+                    boardmarkerWidth: 3,
+                    chalkWidth: 7,
+                    chalkEffect: 1.0,
+                    src: null,
+                    readOnly: undefined,
+                    toggleChalkboardButton: true,
+                    toggleNotesButton: true,
+                    boardmarkers : [
+                        { color: 'rgba(220,20,60,1)', cursor: 'url(' + path + 'img/boardmarker-red.png), auto'},
+                        { color: 'rgba(255,140,0,1)', cursor: 'url(' + path + 'img/boardmarker-orange.png), auto'},
+                    ]
+                },
+
+                math: {
+                    mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
+                    config: 'TeX-AMS_HTML-full',
+                    // pass other options into `MathJax.Hub.Config()`
+                    TeX: { Macros: { RR: "{\\bf R}" } }
+                },
+
+                plugins: [
+                    RevealMath,
+                    RevealHighlight,
+                    RevealMarkdown,
+                    RevealChalkboard
+                ]
+            });
+        </script>
+    </body>
+</html>

@@ -138,7 +138,9 @@ h3.shadow {
   margin: 0 0 0 1.2em; }
 
 .reveal li {
-  padding: .3em 0.8em; }
+  padding: .3em 0.8em;
+  line-height: 1.3em;
+ }
 
 .reveal ol {
   list-style-type: decimal; }
@@ -345,3 +347,10 @@ h3.shadow {
  *********************************************/
 .reveal .slide-number {
 color: #003A40; }
+
+.bio-img {
+  width: 25%;
+  border-radius: 50%;
+  float: right;
+  
+}
