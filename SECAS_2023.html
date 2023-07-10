@@ -176,7 +176,7 @@
 
 
 <section>
-    <h2>Data product</h2>
+    <h2>Data product at a glance</h2>
     <ul>
         <li>future urban growth from <strong>2020 to 2100</strong></li>
         <li>across <strong>CONUS at 30-m</strong> resolution</li>
@@ -237,17 +237,16 @@
 
 <section>
     <h2>Where to develop?</h2>
-    <ol>
-        <li>Derive predictors (distance to water, roads, forest, SVI, crop index, slope)</li>
-        <li>Derive newly developed pixels (raster algebra)</li>
-        <li>Sample predictors (2,000,000 points)</li>
-        <li>Run logistic regression for different combinations of predictors</li>
-        <li>Create development suitability surface</li>
-    </ol>
-    <img src="img/potential.png" class="stretch">
+   <p> Development suitability derived with logistic regression using:
+</p>
+    <ul>
+        <li>Newly developed pixels between 2001-2019</li>
+        <li>Predictors (distance to water, roads, forest, SVI, crop index, slope)</li>
+    </ul>
+    <img src="img/potential.png" width="45%">
 </section>
 <section>
-    <h2>How much land?</h2>
+    <h2>How much land to develop?</h2>
     <p>
     Projects land consumption for each year and county
     based on NLCD and past and projected population:
@@ -260,10 +259,8 @@
 </section>
 <section>
     <h2>What is the size and shape?</h2>
-    <ol>
-        <li>Calibrate patch size and compactness from past urban change</li>
-        <li>Grow patches in suitable areas until demand met</li>
-    </ol>
+    <p>Urban patch size and compactness calibrated from past urban change</p>
+
     <img src="img/PGA.gif" class="stretch">
 </section>
 
@@ -286,7 +283,7 @@
 </section>
 
 <section>
-    <h2>How to test it?</h2>
+    <h2>How to test FUTURES?</h2>
     <p>Test using <a href="https://wholetale.org">The Whole Tale platform</a> for reproducible research
 
     <ul>
@@ -334,21 +331,75 @@
 <section>
     <h2>How to use this data?</h2>
     <ul>
-        <li>For large scale analysis
-            <ul>
-                <li>Local analysis </li>
-            </ul>
-        </li>
+        <li>For large scale analysis</li>
+        <li>Use stochastic runs directly instead od probability</li>
+    </ul>
+    <br>
+    <br>
+    <img src="img/how-to-use.png" class="stretch">
+</section>
 
-        <li>When possible, use stochastic runs directly
-            <ul>
-                <li></li>
-            </ul>
-        </li>
+<section>
+    <h2>How do we define &ldquo;urban&rdquo;?</h2>
+    <!-- <p style="text-align: left;">NLCD urban classes 21-24 -->
+    <p>NLCD urban classes 21-24
+    <ul>
+        <li>Open space (parks, golf courses, ...)</li>
+        <li>Low, medium, high density development</li>
+    </ul>
+
+    <!-- <ul>
+        <li>For large scale analysis</li>
+        <li>Use stochastic runs directly instead od probability</li>
+    </ul> -->
+    <br>
+    <img src="img/open_space.png" height="130px">
+    <img src="img/low_density.png" height="130px">
+    <img src="img/medium_density.png" height="130px">
+    <img src="img/high_density.png" height="130px">
+    <br>
+    <small>Source: Bing Maps</small>
+</section>
+
+<section>
+    <h2>Data updates</h2>
+    <ul>
+        <li>Updates with newer landcover and population estimates</li>
+        <li>NLCD 2021 coming soon</li>
+        <li>Incorporating certain US territories</li>
     </ul>
 </section>
 
+<section>
+    <h2>FUTURES v3</h2>
+    <p>Incorporates <strong>flood hazard</strong> and <strong>response</strong> (retreat, adaptation)
+    
+    <ul>
+        <li>First Street Foundation flood projections</li>
+        <li>Scenarios of adaptive response  based on damage and social vulnerability</li>
+        <li>Dataset available for Southeast US</li>
+    </ul>
+   <br>
+    <img src="img/v3.png" class="stretch">
+</section>
+
+<section>
+    <h2>Our team</h2>
+    <img class="bio-img2" src="img/Georgina_Sanchez.png">
+    <img class="bio-img2" src="img/bio.jpg">
+    <img class="bio-img2" src="img/Ross_Meentemeyer.jpg">
+    <img class="bio-img2" src="img/Adam_Terando.png">
+    <img class="bio-img2" src="img/Margaret_Lawrimore.jpg">
+    <img class="bio-img2" src="img/Helena_Mitasova.jpg">
+    <img class="bio-img2" src="img/Jelena_Vukomanovic.jpg">
+    <img class="bio-img2" src="img/John_Vogler.jpg">
+    <img class="bio-img2" src="img/Vaclav_Petras.jpg">
+    <img class="bio-img2" src="img/Megan_Skrip.jpg">
+    <br>
+    <img src="img/cgaBlack.png" width="30%">
+</section>
 <section><h1>Thank You!</h1></section>
+
 
 <section>
     <h1>Challenges</h1>
@@ -447,12 +498,7 @@
     </li>
 </ul>
 </section>
-<section>
-    <h2>FUTURES v3</h2>
-    Incorporates flood hazard and response (retreat, adaptation) into modeling of future urbanization
-   <br>
-    <img src="img/charleston.png" class="stretch">
-</section>
+
 <section>
     <h2>Resources</h2>
     <ul>
