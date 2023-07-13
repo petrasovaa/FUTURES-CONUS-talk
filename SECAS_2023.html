@@ -130,7 +130,8 @@
         <div class="reveal">
             <div class="slides">
 
-<section>
+
+<section data-background="img/background2.png">
     <h1>Scaling up Urban Growth Projections with FUTURES</h1>
     <p style="margin-top: 0.5em">
         Anna Petrasova
@@ -142,10 +143,9 @@
         <br>
         <a href="http://www.ncsu.edu/" title="NC State University">NC State University</a>
     </p>
-    <img src="img/FUTURES_addon.png" class="stretch">
+    <!-- <img src="img/FUTURES_addon.png" class="stretch"> -->
     <p><small>June 20th, 2023</small></p>
 </section>
-
 
 <section>
 <h2>Anna Petrasova</h2>
@@ -157,14 +157,7 @@
 </ul>
 </section>
 
-
-<section>
-    <h2>CONUS urban growth projections</h2>
-  <!-- animated picture of CONUS dataset with zoomin -->
-  <!-- Talk about what it is, how we created it and how to use it -->
-</section>
-
-<section data-background="img/background1.png">
+<section >
     <h2>Motivation</h2>
     <ul>
         <li>provide <strong>detailed</strong> national urbanization projections</li>
@@ -174,9 +167,16 @@
 
 </section>
 
+<section>
+    <h2>CONUS urban growth projections</h2>
+  <!-- animated picture of CONUS dataset with zoomin -->
+  <!-- Talk about what it is, how we created it and how to use it -->
+  <img src="img/animation_CONUS.gif" class="stretch">
+</section>
+
 
 <section>
-    <h2>Data product at a glance</h2>
+    <h2>Data product</h2>
     <ul>
         <li>future urban growth from <strong>2020 to 2100</strong></li>
         <li>across <strong>CONUS at 30-m</strong> resolution</li>
@@ -188,7 +188,7 @@
         <a href="https://geospatial.ncsu.edu/research/FUTURES">geospatial.ncsu.edu/research/FUTURES</a></small>
 </section>
 
-<section><h2>Input Data</h2></section>
+<section data-background="img/background2.png"><h2>Input Data</h2></section>
 <section>
     <h2>Land cover</h2>
         NLCD 2001 - 2019
@@ -221,7 +221,7 @@
     <small>SVI, source: CDC</small>
 </section>
 
-<section><h2>Modeling</h2></section>
+<section data-background="img/background2.png"><h2>Modeling</h2></section>
 
 <section>
     <h2>FUTURES</h2>
@@ -261,7 +261,7 @@
     <h2>What is the size and shape?</h2>
     <p>Urban patch size and compactness calibrated from past urban change</p>
 
-    <img src="img/PGA.gif" class="stretch">
+    <img src="img/animation_FUTURES.gif" class="stretch">
 </section>
 
 <section>
@@ -307,7 +307,7 @@
 </section>
 
 
-<section>
+<section data-background="img/background2.png">
     <h2>Results</h2>
 </section>
 
@@ -322,6 +322,23 @@
 <section>
     <h2>NE Raleigh: probability</h2>
     <img src="img/raleigh_probability.png" class="stretch">
+</section>
+
+<section>
+    <h2>Atlanta</h2>
+    <img src="img/atlanta2.png" class="stretch">
+</section>
+<section>
+    <h2>New York</h2>
+    <img src="img/newyork2.png" class="stretch">
+</section>
+<section>
+    <h2>Phoenix</h2>
+    <img src="img/phoenix2.png" class="stretch">
+</section>
+<section>
+    <h2>Los Angeles</h2>
+    <img src="img/losangeles.png" class="stretch">
 </section>
 
 <section>
@@ -342,7 +359,9 @@
     <img src="img/allocation_error_map.png" width="45%">
 </section>
 
-<section>
+<section data-background="img/background2.png"><h2>FAQs</h2></section>
+
+<section >
     <h2>How to use this data?</h2>
         <p>It's better to use the projections for <strong>large scale</strong> analysis
         <ul>
@@ -385,7 +404,7 @@
 </section>
 
 <section>
-    <h2>Data updates</h2>
+    <h2>Data updates?</h2>
     <ul>
         <li>Updates with newer landcover and population estimates</li>
         <li>NLCD 2021 coming soon</li>
@@ -421,119 +440,8 @@
     <br>
     <img src="img/cgaBlack.png" width="30%">
 </section>
-<section><h1>Thank You!</h1></section>
+<section data-background="img/background2.png"><h1>Thank You!</h1></section>
 
-
-<section>
-    <h1>Challenges</h1>
-</section>
-<section>
-    <h2>GIS on HPC</h2>
-    <img src="img/HPC_interaction.png" class="stretch">
-</section>
-<section>
-    <h2>Parallelization by states</h2>
-    We needed to respect Metropolitan Statistical Areas boundaries:
-
-    <img src="img/MSA.png" class="stretch">
-</section>
-<section>
-    <h2>SSP5 scenario</h2>
-    <div class="container">
-        <div class="col"><img src="img/SSP.png"></div>
-        <div class="col"><img src="img/SSP5.png"><br>New development by 2100</div>
-    </div>
-</section>
-<section>
-    <h2>Automatic fitting of densification curves</h2>
-   
-    <div class="container">
-        <div class="col"><img src="img/log.png"></div>
-        <div class="col"><img src="img/log2.png"></div>
-    </div>
-    Which curve do we fit?
-
-</section>
-
-<section><h1>Results</h1>(preliminary)</section>
-
-<section>
-    <h2>NE Raleigh by 2100</h2>
-    <div class="container">
-        <div class="col"><img src="img/raleigh_run1.png"></div>
-        <div class="col"><img src="img/raleigh_run2.png"></div>
-    </div>
-    2 runs with different random seeds
-</section>
-<section>
-    <h2>NE Raleigh: probability</h2>
-    <img src="img/raleigh_probability.png" class="stretch">
-</section>
-<section>
-    <h2>Atlanta</h2>
-    <img src="img/atlanta.png" class="stretch">
-</section>
-<section>
-    <h2>New York</h2>
-    <img src="img/newyork.png" class="stretch">
-</section>
-<section>
-    <h2>San Francisco</h2>
-    <img src="img/sanfran.png" class="stretch">
-</section>
-<section>
-    <h2>Phoenix</h2>
-    <img src="img/phoenix.png" class="stretch">
-</section>
-<section>
-    <h2>Houston</h2>
-    <img src="img/houston.png" class="stretch">
-</section>
-<section>
-    <h2>Karnes County, TX</h2>
-    <img src="img/texas.png" class="stretch">
-</section>
-<section>
-    <h2>North Dakota</h2>
-    <img src="img/dakota.png" class="stretch">
-</section>
-
-
-<section>
-<h2>Benchmark examples</h2>
-<ul>
-    <li>Simple raster algebra</li>
-        <ul>
-            <li>30 min without paralellization</li>
-            <li>10 min with tiling approach on 16 cores</li>
-        </ul>
-    <li>Stratified random sampling
-        <ul>
-            <li>approx 2 mil points, 30 rasters</li>
-            <li>2.6 hours on 200 cores</li>
-        </ul>
-    </li>
-    <li> FUTURES patch growing simulation
-        <ul>
-            <li>20-30 hours on 27 cores on 3 nodes with 120 GB each</li>
-            <li>simultaneosly running jobs with different random seeds</li>
-        </ul>
-    </li>
-</ul>
-</section>
-
-<section>
-    <h2>Resources</h2>
-    <ul>
-        <li><a href="https://grasswiki.osgeo.org/wiki/FUTURES_land-change_modeling_for_evaluating_innovative_conservation_scenarios">Tutorial</li>
-        <li><a href="https://mybinder.org/v2/gh/ncsu-landscape-dynamics/futures-model-intro-notebook/main?urlpath=lab/tree/futures_triangle.ipynb">Try it in Jupyter Lab</a> </li>
-        <li><a href="https://github.com/ncsu-landscape-dynamics/GRASS_FUTURES">Code on GitHub</a> </li>    
-    </ul>
-    <p style="margin-top: 3em;">
-        <img src="img/ncstate.png" width="25%">&nbsp;&nbsp;
-    <img src="img/cga.png" width="40%"><br>
-    <a href="https://cnr.ncsu.edu/geospatial/engage/">geospatial.ncsu.edu/engage/</a>
-</section>
 
             </div>
         </div>
