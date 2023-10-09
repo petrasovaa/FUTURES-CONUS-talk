@@ -374,7 +374,11 @@ mark {
     </div>
       <br><br>
 
-      <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span> Use 4 cores to get most speed improvements with high parallel efficiency.</p>
+      <p style="vertical-align: center;">
+        <img src="img/lightbulb.png" style="width: 1.5em;margin: 0px">
+        <!-- <span style="font-size: 150%">&#10152</span> -->
+         Use 4 cores to get most speed improvements with high parallel efficiency.
+         <img src="img/lightbulb.png" style="width: 1.5em;margin: 0px"></p>
         
 </section>
 <section>
@@ -419,13 +423,15 @@ mark {
     </code></pre>
     <img src="img/tiling2.png" class="stretch">
 </section>
-
+<section>
+    <img src="img/nextlevel1.png" class="stretch">
+</section>
 
 <section>
-        <h2>Multi-processing with Python</h2>
+        <h2>Let's do some Python scripting</h2>
         <ul>
-            <li><em>multiprocessing</em> package and others</li>
-            <li>separate OS processes</li>
+            <li><em>multiprocessing</em>, <em>concurrent.futures</em> packages</li>
+            <li>Use case: calling GRASS tools and workflows in parallel</li>
         </ul>
         <pre><code data-trim data-noescape data-line-numbers="1,6,7">
             from multiprocessing import Pool
@@ -434,17 +440,15 @@ mark {
                 # do something with the value
     
             with Pool(processes=4) as pool:
-                pool.map_async(compute, range(0, 10))
+                pool.map(compute, range(0, 10))
         </code></pre>
 
-        Used by GRASS tools and addons calling other GRASS tools: <br><br>
-        r.sun.daily, r.in.usgs, t.rast.what, r.viewshed.exposure, ...
+        Used in r.sun.daily, r.in.usgs, t.rast.what, r.viewshed.exposure, ...
 </section>
 
 
-<section data-background-image="img/inundation.gif" data-background-opacity="0.4">
-    <!-- <section data-background-image="https://baharmon.github.io/images/governors-island/flooding.gif" data-background-opacity="0.4"> -->
-        <h2>Multiple independent tasks: Python</h2>
+<!-- <section data-background-image="img/inundation.gif" data-background-opacity="0.3">
+        <h2>Example: increasing water level</h2>
         <pre><code data-trim data-noescape>
             from multiprocessing import Pool
             import grass.script as gs
@@ -456,10 +460,155 @@ mark {
                 return name
     
             with Pool(processes=4) as pool:
-                maps = pool.map_async(inundate, range(0, 10)).get()
+                maps = pool.map(inundate, range(0, 10))
         </code></pre>
+        <ul style="list-style: none;">
+        <li>&#10004; independent computations</li>
+        <li>&#10004; different output names</li>
+        </ul>
+</section> -->
+
+<section data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
+    <!-- <section data-background-image="https://baharmon.github.io/images/governors-island/flooding.gif" data-background-opacity="0.4"> -->
+        <h2>Example: multiple viewsheds</h2>
+        <pre><code data-trim data-noescape>
+        from multiprocessing import Pool
+        import grass.script as gs
+    
+        def viewshed(point):
+            x, y, cat = point
+            name = f"viewshed_{cat}"
+            gs.run_command("r.viewshed", input="elevation", output=name,
+                           coordinates=(x, y))
+            return name
+    
+        # viewpoints = [(x1, y1, category1), (x2, y2, category2), ...]
+        with Pool(processes=4) as pool:
+            maps = pool.map(viewshed, viewpoints)
+        </code></pre>
+        <ul style="list-style: none;">
+        <li>&#10004; independent computations</li>
+        <li>&#10004; different output names</li>
+        <li>&#10004; same computational region</li>
+        </ul>
 </section>
 
+<section data-transition="none" data-background-image="img/viewsheds.gif"
+ data-background-opacity="0.7">
+    <h2><img src="img/lightbulb.png" style="width: 1.5em;margin: 0px">
+        Tasks with different region
+        <img src="img/lightbulb.png" style="width: 1.5em;margin: 0px"></h2>
+    <pre><code data-trim data-noescape data-line-numbers>
+        import os
+        from multiprocessing import Pool
+        import grass.script as gs
+        
+        def viewshed(point):
+            x, y, cat = point
+            name = f"viewshed_{cat}"
+            os.environ["GRASS_REGION"] = gs.region_env(e=x + 300, w=x - 300,
+                                                       n=y + 300, s=y - 300,
+                                                       align="elevation")
+            gs.run_command("r.viewshed", input="elevation", output=name,
+                           coordinates=(x, y), max_distance=300)
+            return name
+        
+        # viewpoints = [(x1, y1, category1), (x2, y2, category2), ...]
+        with Pool(processes=4) as pool:
+            maps = pool.map_async(viewshed, viewpoints).get()
+    </code></pre>
+</section>
+<section data-transition="none" data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
+    <h2><img src="img/lightbulb.png" style="width: 1.5em;margin: 0px">
+        Tasks with different region
+        <img src="img/lightbulb.png" style="width: 1.5em;margin: 0px"></h2>
+    <pre><code data-trim data-noescape data-line-numbers="8-10">
+        import os
+        from multiprocessing import Pool
+        import grass.script as gs
+        
+        def viewshed(point):
+            x, y, cat = point
+            name = f"viewshed_{cat}"
+            os.environ["GRASS_REGION"] = gs.region_env(e=x + 300, w=x - 300,
+                                                       n=y + 300, s=y - 300,
+                                                       align="elevation")
+            gs.run_command("r.viewshed", input="elevation", output=name,
+                           coordinates=(x, y), max_distance=300)
+            return name
+        
+        # viewpoints = [(x1, y1, category1), (x2, y2, category2), ...]
+        with Pool(processes=4) as pool:
+            maps = pool.map_async(viewshed, viewpoints).get()
+    </code></pre>
+</section>
+
+<section>
+    <!-- <section data-background-image="https://baharmon.github.io/images/governors-island/flooding.gif" data-background-opacity="0.4"> -->
+        <h2><img src="img/lightbulb.png" style="width: 1.5em;margin: 0px">
+            Progress bar
+            <img src="img/lightbulb.png" style="width: 1.5em;margin: 0px"></h2>
+        <pre><code data-trim data-noescape data-line-numbers="1,14-15">
+        from tqdm import tqdm
+        from multiprocessing import Pool
+        import grass.script as gs
+    
+        def viewshed(point):
+            x, y, cat = point
+            name = f"viewshed_{cat}"
+            gs.run_command("r.viewshed", input="elevation", output=name,
+                           coordinates=(x, y))
+            return name
+    
+        # viewpoints = [(x1, y1, category1), (x2, y2, category2), ...]
+        with Pool(processes=4) as pool:
+            maps = list(tqdm(pool.imap(viewshed, viewpoints),
+                             total=len(viewpoints)))
+        </code></pre>
+        <img src="img/tqdm.gif">
+</section>
+<!-- <section data-transition="none" data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
+    <h2>Multiple tasks with different region</h2>
+    <pre><code data-trim data-noescape data-line-numbers="8-13">
+        import os
+        from multiprocessing import Pool
+        import grass.script as gs
+        
+        def viewshed(point):
+            x, y, cat = point
+            name = f"viewshed_{cat}"
+            <mark>env</mark> = os.environ.copy()
+            <mark>env</mark>["GRASS_REGION"] = gs.region_env(e=x + 300, w=x - 300,
+                                                n=y + 300, s=y - 300,
+                                                align="elevation")
+            gs.run_command("r.viewshed", input="elevation", output=name,
+                           coordinates=(x, y), max_distance=300, <mark>env=env</mark>)
+            return name
+        
+        # viewpoints = [(x1, y1, category1), (x2, y2, category2), ...]
+        with Pool(processes=4) as pool:
+            maps = pool.map_async(viewshed, viewpoints).get()
+    </code></pre>
+</section> -->
+
+<!-- <section>
+    <h2>Multiprocessing in Jupyter Notebooks</h2>
+    This may not work from Jupyter Notebook:
+   <img src="img/jupyter1.png" class="stretch">
+</section>
+<section>
+    <h2>Multiprocessing in Jupyter Notebooks</h2>
+    
+   <img src="img/jupyter2.png" class="stretch">
+</section>
+
+<section>
+    <img src="img/nextlevel1.png" class="stretch">
+</section> -->
+
+<section>
+    <img src="img/nextlevel1.png" class="stretch">
+</section>
 
 <section>
     <h2>Multi-threading with OpenMP</h2>
@@ -487,92 +636,51 @@ mark {
 </section>
 
 <section>
-    <h2>Tips & Tricks & Benchmarks</h2>
+    <h2>grass.benchmark library</h2>
+    <pre><code data-trim data-noescape>
+from grass.benchmark import benchmark_nprocs, nprocs_plot
+from grass.pygrass.modules import Module
+
+module = Module("r.neighbors", input="DEM", size=9, output="benchmark",
+                run_=False, overwrite=True)
+result = benchmark_nprocs(module, label="size 3", max_nprocs=12, repeat=3)
+nprocs_plot([result], filename="benchmark.svg")
+</code></pre>
+<img src="img/openmp_graph.png" class="stretch">
 </section>
 
+<section>
+    <h2>Example: r.neighbors</h2>
+    
+    <img src="https://grass.osgeo.org/grass-stable/manuals/r_neighbors.png">
+    <small>Image source: r.neighbors manual page</small>
+    <br><br><br>
+    <p> Focal (neighborhood) operations on a raster</p>
+    
+        
+</section>
 
 <section>
     <h2>r.neighbors benchmark <span style="font-size:60%">400 million cells</span></h2>
     <p style="font-size:60%">\[\mbox{parallel efficiency} = \frac{\mbox{serial processing time}}{N \times \mbox{parallel processing time with N cores}} \]</p>
     <img src="img/benchmark.svg" class="stretch">
-    <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span> Use more cores for r.neighbors and r.mfilter with large window sizes.</p>
-    
+    <p style="vertical-align: center;">
+        <!-- <span style="font-size: 150%">&#10152</span> -->
+        <img src="img/lightbulb.png" style="width: 1.5em;margin: 0px">
+        Use more cores for r.neighbors with large window sizes.
+        <img src="img/lightbulb.png" style="width: 1.5em;margin: 0px"></p>
 </section>
 
-
-
-
-
-
-<section data-transition="none" data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
-    <h2>Multiple tasks with different region</h2>
-    <pre><code data-trim data-noescape data-line-numbers>
-        import os
-        from multiprocessing import Pool
-        import grass.script as gs
-        
-        def viewshed(point):
-            x, y, cat = point
-            name = f"viewshed_{cat}"
-            os.environ["GRASS_REGION"] = gs.region_env(e=x + 300, w=x - 300,
-                                                       n=y + 300, s=y - 300,
-                                                       align="elevation")
-            gs.run_command("r.viewshed", input="elevation", output=name,
-                           coordinates=(x, y), max_distance=300)
-            return name
-        
-        # viewpoints = [(x1, y1, category1), (x2, y2, category2), ...]
-        with Pool(processes=4) as pool:
-            maps = pool.map_async(viewshed, viewpoints).get()
-    </code></pre>
-</section>
-<section data-transition="none" data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
-    <h2>Multiple tasks with different region</h2>
-    <pre><code data-trim data-noescape data-line-numbers="8-10">
-        import os
-        from multiprocessing import Pool
-        import grass.script as gs
-        
-        def viewshed(point):
-            x, y, cat = point
-            name = f"viewshed_{cat}"
-            os.environ["GRASS_REGION"] = gs.region_env(e=x + 300, w=x - 300,
-                                                       n=y + 300, s=y - 300,
-                                                       align="elevation")
-            gs.run_command("r.viewshed", input="elevation", output=name,
-                           coordinates=(x, y), max_distance=300)
-            return name
-        
-        # viewpoints = [(x1, y1, category1), (x2, y2, category2), ...]
-        with Pool(processes=4) as pool:
-            maps = pool.map_async(viewshed, viewpoints).get()
-    </code></pre>
-</section>
-<section data-transition="none" data-background-image="img/viewsheds.gif" data-background-opacity="0.7">
-    <h2>Multiple tasks with different region</h2>
-    <pre><code data-trim data-noescape data-line-numbers="8-13">
-        import os
-        from multiprocessing import Pool
-        import grass.script as gs
-        
-        def viewshed(point):
-            x, y, cat = point
-            name = f"viewshed_{cat}"
-            <mark>env</mark> = os.environ.copy()
-            <mark>env</mark>["GRASS_REGION"] = gs.region_env(e=x + 300, w=x - 300,
-                                                n=y + 300, s=y - 300,
-                                                align="elevation")
-            gs.run_command("r.viewshed", input="elevation", output=name,
-                           coordinates=(x, y), max_distance=300, <mark>env=env</mark>)
-            return name
-        
-        # viewpoints = [(x1, y1, category1), (x2, y2, category2), ...]
-        with Pool(processes=4) as pool:
-            maps = pool.map_async(viewshed, viewpoints).get()
-    </code></pre>
-</section>
 
 <section>
+    <img src="img/nextlevel1.png" class="stretch">
+</section>
+
+
+
+
+
+<!-- <section>
     <h2>Tiling approach: large overhead</h2>
     <p>Overhead from <strong>merging</strong> data and <strong>I/O</strong>:
     <br>
@@ -603,14 +711,14 @@ mark {
     <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span>Long running in-memory computations
     <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span> Use r.mapcalc.tiled for complex raster algebra expressions
 
-</section>
-
+</section> -->
+<!-- 
 <section>
     <h2>Tiling approach: tiling scheme</h2>
     <img class="fragment fade-out" data-fragment-index="1" src="img/tiling2.png" width="40%">
     <img class="fragment fade-right" data-fragment-index="1" src="img/tiling1.png" width="40%">
     <p class="fragment fade-right" data-fragment-index="1" style="vertical-align: center;"><span style="font-size: 150%">&#10152</span>Slice data horizontally
-</section>
+</section> -->
 
 
 
@@ -653,10 +761,25 @@ parallel --jobs 8 < jobs.sh
 </code></pre>
 </section>
 
+<section>
+    <h2>Example: Scaling urban growth model</h2>
+<img src="img/animation_CONUS.gif" class="stretch">
+</section>
 
 
+<section data-background="img/background2.png">
+    <h2>Example: Scaling urban growth model</h2>
+    <ul>
+        <li>computed at <strong>30-m</strong> resolution (16 billion cells) on HPC</li>
+        <li>future urban growth from <strong>2020 to 2100</strong></li>
+        <li><strong>50 stochastic</strong> iterations at annual time steps</li>
+        <li>r.futures addon: FUTURES urban growth model </li>
+    </ul>
+    <p>Accessible from <small>
+        <a href="https://geospatial.ncsu.edu/research/FUTURES">geospatial.ncsu.edu/research/FUTURES</a></small>
+</section>
 
-<section >
+<!-- <section >
     <h2>Caveats: r.mask</h2>
     <p style="vertical-align: center;"><span style="font-size: 150%">&#10152</span>
     Do <strong>not</strong> use mask in parallel within the same mapset:</p>
@@ -689,40 +812,8 @@ parallel --jobs 8 < jobs.sh
 
     
     <img src="img/reclass_from.png" class="stretch">
-</section>
-<section>
-    <h2>Multiprocessing in Jupyter Notebooks</h2>
-    This may not work from Jupyter Notebook:
-   <img src="img/jupyter1.png" class="stretch">
-</section>
-<section>
-    <h2>Multiprocessing in Jupyter Notebooks</h2>
-    
-   <img src="img/jupyter2.png" class="stretch">
-</section>
+</section> -->
 
-<section>
-    <h2>Scaling urban growth model</h2>
-    <img src="img/FUTURES_addon.png" class="stretch">
-    <!-- <img src="img/gui_pink_viewshed.png" class="stretch"> -->
-</section>
-
-
-
-<section>
-    <h2>FUTURES</h2>
-    
-    <ul>
-        <li><b>FUT</b>ure <b>U</b>rban-<b>R</b>egional <b>E</b>nvironment <b>S</b>imulation</li>
-        <li>explicitly captures the spatial structure of development</li>
-        <li>stochastic, flexible (in terms of predictors, scenarios)</li>
-        <li>implemented as r.futures tool set in GRASS Addons</li>
-    </ul>
-    <img src="img/futures_schema2.png" class="stretch">
-    <!-- <img src="img/FUTURES_Raleigh.png" class="stretch"> -->
-    <p>
-        <a href="https://cnr.ncsu.edu/geospatial/research/FUTURES/">cnr.ncsu.edu/geospatial/research/FUTURES</a>
-</section>
 
 
 
@@ -841,46 +932,6 @@ parallel --jobs 8 < jobs.sh
         <p style="font-size:35%;">texasproud.com/how-big-is-texas-its-huge</p>
 </section>
 
-<section><h1>Results</h1></section>
-
-<section>
-    <iframe class="stretch" style="border: none;" src="https://futures.tilia.cnr.ncsu.edu/maps/5/embed"></iframe>
-</section>
-
-
-
-<!-- <section>
-    <h2>NE Raleigh by 2100</h2>
-    <div class="container">
-        <div class="col"><img src="img/raleigh_run1.png"></div>
-        <div class="col"><img src="img/raleigh_run2.png"></div>
-    </div>
-    2 runs with different random seeds
-</section>
-<section>
-    <h2>NE Raleigh: probability</h2>
-    <img src="img/raleigh_probability.png" class="stretch">
-</section> -->
-<section>
-    <h2>Atlanta</h2>
-    <img src="img/atlanta.png" class="stretch">
-</section>
-<section>
-    <h2>New York</h2>
-    <img src="img/newyork.png" class="stretch">
-</section>
-<section>
-    <h2>San Francisco</h2>
-    <img src="img/sanfran.png" class="stretch">
-</section>
-<section>
-    <h2>Phoenix</h2>
-    <img src="img/phoenix.png" class="stretch">
-</section>
-<section>
-    <h2>Houston</h2>
-    <img src="img/houston.png" class="stretch">
-</section>
 
 <section>
     <h2>Resources</h2>
